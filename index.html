@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Week.world - 64 Şehir Sürümü</title>
+<title>Week.world - Pro Edition</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -26,7 +26,24 @@ body{margin:0;font-family:'Segoe UI',Arial;overflow:hidden; background: #000;}
     transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-/* GEOGUESSR TARZI RANK PANELİ */
+/* SOL ÜST OYNAMA SÜRESİ PANELİ */
+#playtime-container {
+    position: fixed;
+    top: 25px;
+    left: 25px;
+    background: rgba(20, 25, 35, 0.85);
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 10001;
+    color: white;
+    backdrop-filter: blur(8px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.playtime-label { font-size: 10px; text-transform: uppercase; color: #9da3af; letter-spacing: 1px; font-weight: 800; margin-bottom: 20px; }
+#playtime-display { font-size: 16px; font-weight: bold; color: #ffcc00; }
+
+/* SAĞ ÜST RANK PANELİ */
 #rank-container {
     position: fixed;
     top: 25px;
@@ -73,6 +90,11 @@ button.guess-btn { padding:14px 45px;font-size:18px;border:none;border-radius:30
 </head>
 <body>
 
+<div id="playtime-container">
+    <div class="playtime-label">TOPLAM OYNAMA SÜRESİ</div>
+    <div id="playtime-display">0 Saat 0 Dakika</div>
+</div>
+
 <div id="rank-container">
     <div class="rank-header">
         <div id="rank-emoji">⛓️</div>
@@ -87,7 +109,7 @@ button.guess-btn { padding:14px 45px;font-size:18px;border:none;border-radius:30
 <div id="main-menu">
     <div class="menu-header">
         <h1 style="font-size:5rem; color:white; margin:0;">Week.world</h1>
-        <p style="color:white; opacity:0.6;">64 Şehir | Tüm Kıtalar | Rütbeni Kanıtla</p>
+        <p style="color:white; opacity:0.6;">Dünyayı Keşfet | Rütbeni Yükselt</p>
     </div>
     <div class="modes-container" style="display:flex; gap:30px;">
         <div class="mode-card" onclick="startGame('speedrun')"><span class="mode-icon">⏱️</span><h3>Speedrun</h3><p class="mode-desc">1 dakika! Çok hızlı olmalısın.</p></div>
@@ -107,40 +129,22 @@ button.guess-btn { padding:14px 45px;font-size:18px;border:none;border-radius:30
 <div id="map"></div>
 
 <script>
+// --- VERİ SİSTEMİ ---
 let wins = parseInt(localStorage.getItem('weekWorldWins')) || 0;
-var map=L.map('map', {zoomControl: false, attributionControl: false}).setView([20,0],2);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+let totalSeconds = parseInt(localStorage.getItem('weekWorldPlaytime')) || 0;
 
-// TOPLAM 64 ŞEHİR (15 Klasik + 49 Yeni/Zor)
-var cities = [
-    // --- KLASİKLER (15) ---
-    ["Ankara",39.93,32.85],["Berlin",52.52,13.40],["Madrid",40.41,-3.70],["Roma",41.90,12.49],["Atina",37.98,23.72],
-    ["Paris",48.85,2.35],["Londra",51.50,-0.12],["Tokyo",35.67,139.65],["New York",40.71,-74.00],["Rio de Janeiro",-22.90,-43.17],
-    ["İstanbul",41.00,28.97],["Moskova",55.75,37.61],["Dubai",25.20,55.27],["Seul",37.56,126.97],["Pekin",39.90,116.40],
-    
-    // --- AVRUPA (Zorlaşanlar) ---
-    ["Reykjavik",64.13,-21.82],["Oslo",59.91,10.75],["Helsinki",60.16,24.93],["Lizbon",38.72,-9.13],["Varşova",52.22,21.01],
-    ["Budapeşte",47.49,19.04],["Viyana",48.20,16.37],["Prag",50.07,14.43],["Kiev",50.45,30.52],["Bükreş",44.42,26.10],
-    
-    // --- ASYA & OKYANUSYA ---
-    ["Bangkok",13.75,100.50],["Jakarta",-6.20,106.84],["Mumbai",19.07,72.87],["Hanoi",21.02,105.83],["Manila",14.59,120.98],
-    ["Sidney",-33.86,151.20],["Auckland",-36.84,174.76],["Perth",-31.95,115.86],["Suva",-18.12,178.45],["Ulan Batur",47.88,106.89],
-    ["Astana",51.16,71.47],["Taşkent",41.29,69.24],["Katmandu",27.71,85.32],["Taipei",25.03,121.56],
-    
-    // --- AMERİKA (Kuzey & Güney) ---
-    ["Toronto",43.65,-79.38],["Meksiko",19.43,-99.13],["Havana",23.11,-82.36],["Bogota",4.71,-74.07],["Lima",-12.04,-77.04],
-    ["Santiago",-33.44,-70.66],["Buenos Aires",-34.60,-58.38],["Anchorage",61.21,-149.90],["Vancouver",49.28,-123.12],["Nuuk",64.18,-51.72],
-    ["Quito",-0.18,-78.46],["Caracas",10.48,-66.90],["La Paz",-16.48,-68.11],
-    
-    // --- AFRİKA ---
-    ["Kahire",30.04,31.23],["Kazablanka",33.57,-7.58],["Nairobi",-1.29,36.82],["Cape Town",-33.92,18.42],["Lagos",6.52,3.37],
-    ["Addis Ababa",9.01,38.74],["Dakar",14.71,-17.46],["Tunus",36.80,10.18],["Antananarivo",-18.87,47.50],["Luanda",-8.83,13.23],
-    ["Hartum",15.50,32.55]
-];
+// SÜRE SİSTEMİ (Her saniye çalışır)
+setInterval(() => {
+    totalSeconds++;
+    localStorage.setItem('weekWorldPlaytime', totalSeconds);
+    updatePlaytimeUI();
+}, 1000);
 
-var selectedCity, lastCityIndex=-1, guessMarker=null, realMarker=null, line=null;
-var score=0, timerInterval, timeLeft=120, roundActive=false, currentMode='normal';
-const MAX_SCORE=25000;
+function updatePlaytimeUI() {
+    let hours = Math.floor(totalSeconds / 3600);
+    let minutes = Math.floor((totalSeconds % 3600) / 60);
+    document.getElementById('playtime-display').innerText = `${hours} Saat ${minutes} Dakika`;
+}
 
 function updateRankUI() {
     const ticksContainer = document.getElementById('win-ticks');
@@ -172,6 +176,31 @@ function updateRankUI() {
     }
 }
 
+// --- OYUN MANTIĞI ---
+var map=L.map('map', {zoomControl: false, attributionControl: false}).setView([20,0],2);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+var cities = [
+    ["Ankara",39.93,32.85],["Berlin",52.52,13.40],["Madrid",40.41,-3.70],["Roma",41.90,12.49],["Atina",37.98,23.72],
+    ["Paris",48.85,2.35],["Londra",51.50,-0.12],["Tokyo",35.67,139.65],["New York",40.71,-74.00],["Rio de Janeiro",-22.90,-43.17],
+    ["İstanbul",41.00,28.97],["Moskova",55.75,37.61],["Dubai",25.20,55.27],["Seul",37.56,126.97],["Pekin",39.90,116.40],
+    ["Reykjavik",64.13,-21.82],["Oslo",59.91,10.75],["Helsinki",60.16,24.93],["Lizbon",38.72,-9.13],["Varşova",52.22,21.01],
+    ["Budapeşte",47.49,19.04],["Viyana",48.20,16.37],["Prag",50.07,14.43],["Kiev",50.45,30.52],["Bükreş",44.42,26.10],
+    ["Bangkok",13.75,100.50],["Jakarta",-6.20,106.84],["Mumbai",19.07,72.87],["Hanoi",21.02,105.83],["Manila",14.59,120.98],
+    ["Sidney",-33.86,151.20],["Auckland",-36.84,174.76],["Perth",-31.95,115.86],["Suva",-18.12,178.45],["Ulan Batur",47.88,106.89],
+    ["Astana",51.16,71.47],["Taşkent",41.29,69.24],["Katmandu",27.71,85.32],["Taipei",25.03,121.56],
+    ["Toronto",43.65,-79.38],["Meksiko",19.43,-99.13],["Havana",23.11,-82.36],["Bogota",4.71,-74.07],["Lima",-12.04,-77.04],
+    ["Santiago",-33.44,-70.66],["Buenos Aires",-34.60,-58.38],["Anchorage",61.21,-149.90],["Vancouver",49.28,-123.12],["Nuuk",64.18,-51.72],
+    ["Quito",-0.18,-78.46],["Caracas",10.48,-66.90],["La Paz",-16.48,-68.11],
+    ["Kahire",30.04,31.23],["Kazablanka",33.57,-7.58],["Nairobi",-1.29,36.82],["Cape Town",-33.92,18.42],["Lagos",6.52,3.37],
+    ["Addis Ababa",9.01,38.74],["Dakar",14.71,-17.46],["Tunus",36.80,10.18],["Antananarivo",-18.87,47.50],["Luanda",-8.83,13.23],
+    ["Hartum",15.50,32.55]
+];
+
+var selectedCity, lastCityIndex=-1, guessMarker=null, realMarker=null, line=null;
+var score=0, timerInterval, timeLeft=120, roundActive=false, currentMode='normal';
+const MAX_SCORE=25000;
+
 function backToLobby() {
     clearInterval(timerInterval);
     roundActive = false;
@@ -181,23 +210,32 @@ function backToLobby() {
     }
     document.getElementById("result").style.display = "none";
     document.getElementById("distanceBox").style.display = "none";
+    
+    // MENÜ PANELLERİNİ GÖSTER
     document.getElementById('main-menu').style.visibility = 'visible';
     document.getElementById('main-menu').style.opacity = '1';
     document.getElementById('rank-container').style.opacity = '1';
+    document.getElementById('playtime-container').style.opacity = '1';
+
     if(guessMarker) map.removeLayer(guessMarker);
     if(realMarker) map.removeLayer(realMarker);
     if(line) map.removeLayer(line);
     map.setView([20,0],2);
     updateRankUI();
+    updatePlaytimeUI();
 }
 
 function startGame(mode) {
     currentMode = mode;
     score = 0;
     document.getElementById("score").innerText = "0";
+    
+    // TÜM PANELLERİ GİZLE
     document.getElementById('main-menu').style.opacity = '0';
     document.getElementById('main-menu').style.visibility = 'hidden';
     document.getElementById('rank-container').style.opacity = '0';
+    document.getElementById('playtime-container').style.opacity = '0';
+
     setTimeout(() => { map.invalidateSize(); startRound(); }, 600);
 }
 
@@ -270,14 +308,14 @@ function makeGuess(){
         } else {
             let countdown = 10;
             document.getElementById("timer").style.display = "block";
-            document.getElementById("timer").innerText = "Sıradaki Tur: " + countdown;
+            document.getElementById("timer").innerText = "Sıradaki: " + countdown;
             timerInterval = setInterval(() => {
                 countdown--;
                 if(countdown <= 0) {
                     clearInterval(timerInterval);
                     startRound();
                 } else {
-                    document.getElementById("timer").innerText = "Sıradaki Tur: " + countdown;
+                    document.getElementById("timer").innerText = "Sıradaki: " + countdown;
                 }
             }, 1000);
         }
@@ -296,7 +334,9 @@ function showFinalScreen(){
     document.getElementById("result").innerHTML = `<div style='text-align:center;'><h2 style='color:#00c853;'>TEBRİKLER!</h2><p>25.000 Puan Barajını Geçtin.</p><button onclick='backToLobby()' style='background:#2962ff; color:white; padding:15px 30px; border:none; border-radius:15px; font-weight:bold; cursor:pointer;'>LOBİYE DÖN</button></div>`;
 }
 
+// Başlangıç güncellemeleri
 updateRankUI();
+updatePlaytimeUI();
 </script>
 </body>
 </html>
