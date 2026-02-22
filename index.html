@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Week.world - Pro Edition PC (Fixed)</title>
+<title>Week.world - Pro Edition PC</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -26,7 +26,7 @@
         transition: opacity 0.5s ease;
     }
 
-    /* PANELLER (OYUN BOYUNCA GÖRÜNÜR) */
+    /* PANELLER (LOBİDE GÖRÜNÜR) */
     #playtime-container {
         position: fixed; top: 25px; left: 25px;
         background: rgba(20, 25, 35, 0.9); padding: 12px 20px;
@@ -62,7 +62,6 @@
     
     .result-box{ position:fixed;top:50%;left:50%;transform:translate(-50%,-50%); background:white;padding:40px;border-radius:24px; z-index:10000; display:none; text-align:center; width:400px; color: black; box-shadow: 0 0 50px rgba(0,0,0,0.5);}
 
-    /* MOD KARTLARI */
     .modes-container { display:flex; gap:30px; margin-top: 40px; }
     .mode-card { width: 280px; height: 380px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; }
     .mode-card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.1); border-color: #ffcc00; }
@@ -110,7 +109,6 @@
 <div id="map"></div>
 
 <script>
-// --- ŞEHİR VERİSİ ---
 var cities = [
     ["İstanbul",41.00,28.97],["Ankara",39.93,32.85],["İzmir",38.41,27.12],["Antalya",36.89,30.71],
     ["Londra",51.50,-0.12],["Paris",48.85,2.35],["Berlin",52.52,13.40],["Roma",41.90,12.49],
@@ -130,7 +128,6 @@ var cities = [
     ["Bogota",4.71,-74.07],["Cape Town",-33.92,18.42],["Nairobi",-1.29,36.82],["Auckland",-36.84,174.76]
 ];
 
-// --- SİSTEM DEĞİŞKENLERİ ---
 var map = L.map('map', {zoomControl: false, attributionControl: false, worldCopyJump: true}).setView([20,0], 3);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
@@ -138,7 +135,6 @@ var selectedCity, lastCityIndex=-1, guessMarker=null, realMarker=null, line=null
 var score=0, wins=parseInt(localStorage.getItem('weekWorldWins'))||0, totalSeconds=parseInt(localStorage.getItem('weekWorldPlaytime'))||0;
 var timerInterval, nextRoundInterval, timeLeft=120, roundActive=false, currentMode='normal', lastGuessDist=0;
 
-// Oynama süresi her zaman çalışır
 setInterval(() => {
     totalSeconds++; 
     localStorage.setItem('weekWorldPlaytime', totalSeconds);
@@ -168,52 +164,47 @@ function updateRankUI() {
 function startGame(mode) {
     currentMode = mode;
     score = 0;
-    lastGuessDist = 0; // Mesafe sıfırla
+    lastGuessDist = 0;
     document.getElementById("score").innerText = "0";
+    
+    // MENÜ VE PANELLERİ GİZLE
     document.getElementById('main-menu').style.opacity = '0';
+    document.getElementById('playtime-container').style.display = 'none';
+    document.getElementById('rank-container').style.display = 'none';
+
     setTimeout(() => { 
         document.getElementById('main-menu').style.display = 'none';
         map.invalidateSize();
-        startRound(true); // İlk raunt her zaman full süre
+        startRound(true);
     }, 500);
 }
 
 function startRound(forceResetTime = false) {
     if(score >= 25000) { showFinalScreen(); return; }
-    
-    // Temizlik
     if(guessMarker) map.removeLayer(guessMarker);
     if(realMarker) map.removeLayer(realMarker);
     if(line) map.removeLayer(line);
     document.getElementById("distanceBox").style.display="none";
     document.getElementById("guessBtn").style.display="block";
     
-    // Süre Mantığı
     if(currentMode === 'speedrun') {
-        // Sadece mesafe 500km altındaysa veya zorunluysa süreyi 60 yap
-        if(lastGuessDist < 500 || forceResetTime) {
-            timeLeft = 60;
-        }
-        // Eğer 500km'den fazlaysa timeLeft değişmez (ceza)
+        if(lastGuessDist < 500 || forceResetTime) timeLeft = 60;
     } else {
         timeLeft = 120;
     }
 
     document.getElementById("timer").style.display = (currentMode === 'hardcore') ? "none" : "block";
-    
     let index;
     do{ index = Math.floor(Math.random()*cities.length); } while(index === lastCityIndex);
     lastCityIndex = index;
     selectedCity = cities[index];
     document.getElementById("cityName").innerText = selectedCity[0];
-    
     roundActive = true;
     updateTimerUI();
     clearInterval(timerInterval);
     if(currentMode !== 'hardcore') {
         timerInterval = setInterval(() => {
-            timeLeft--; 
-            updateTimerUI();
+            timeLeft--; updateTimerUI();
             if(timeLeft<=0) { clearInterval(timerInterval); gameOver("Süre Doldu!"); }
         }, 1000);
     }
@@ -235,41 +226,32 @@ function makeGuess() {
     roundActive = false;
     clearInterval(timerInterval);
     document.getElementById("guessBtn").style.display = "none";
-
     let realPos = L.latLng(selectedCity[1], selectedCity[2]);
     let guessPos = guessMarker.getLatLng();
     realMarker = L.marker(realPos).addTo(map);
     line = L.polyline([guessPos, realPos], {color: 'red', weight: 3}).addTo(map);
-    
     lastGuessDist = Math.round(map.distance(guessPos, realPos) / 1000);
-    
     if(currentMode === 'hardcore' && lastGuessDist > 500) { gameOver("500km sınırı aşıldı!"); return; }
-
     let roundScore = Math.max(0, 5000 - (lastGuessDist * 5));
     score += roundScore;
     document.getElementById("score").innerText = score;
     document.getElementById("distanceBox").innerText = `${lastGuessDist} km mesafe | +${roundScore} Puan`;
     document.getElementById("distanceBox").style.display = "block";
-
-    if(score >= 25000) {
-        setTimeout(showFinalScreen, 1500);
-    } else {
-        startCountdown();
-    }
+    if(score >= 25000) setTimeout(showFinalScreen, 1500);
+    else startCountdown();
 }
 
 function startCountdown() {
     let waitTime = 10;
     document.getElementById("timer").style.display = "block";
     document.getElementById("timer").innerText = "Sıradaki: " + waitTime;
-    
     clearInterval(nextRoundInterval);
     nextRoundInterval = setInterval(() => {
         waitTime--;
         document.getElementById("timer").innerText = "Sıradaki: " + waitTime;
         if(waitTime <= 0) {
             clearInterval(nextRoundInterval);
-            startRound(false); // Speedrun için ceza kontrolü içeride yapılacak
+            startRound(false);
         }
     }, 1000);
 }
@@ -279,6 +261,7 @@ function gameOver(msg) {
     clearInterval(nextRoundInterval);
     document.getElementById("result").style.display = "block";
     document.getElementById("result").innerHTML = `<h2>OYUN BİTTİ</h2><p>${msg}</p><button onclick="location.reload()" style="padding:15px 30px; cursor:pointer; background:#ffcc00; border:none; border-radius:10px; font-weight:bold;">LOBİYE DÖN</button>`;
+    // PANELLERİ TEKRAR GÖSTERMEK İÇİN location.reload() kullanıyoruz zaten
 }
 
 function showFinalScreen() {
