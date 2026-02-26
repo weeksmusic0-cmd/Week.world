@@ -41,27 +41,43 @@
     }
     #challenge-menu, #profile-edit-menu, #market-menu { display: none; flex-direction: column; justify-content: center; z-index: 10001; }
 
-    /* GERİ SAYIM ANİMASYONU */
+    /* GEÇİŞ EKRANI */
     #start-countdown-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: radial-gradient(circle, #1a1a1a 0%, #000 100%); z-index: 20000;
         display: none; flex-direction: column; align-items: center; justify-content: center;
         text-align: center;
     }
-    .fade-zoom-in { animation: zoomIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     .slide-up-out { animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    @keyframes zoomIn { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
     @keyframes slideUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
     .countdown-number { font-size: 12rem; font-weight: 900; color: white; animation: pulseNumber 1s infinite; }
     @keyframes pulseNumber { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
 
-    /* MARKET STİLLERİ */
+    /* YENİ PUAN ANİMASYON KATMANI */
+    #score-animation-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 50000; display: none; align-items: center; justify-content: center;
+        pointer-events: none;
+    }
+    .score-anim-container { position: relative; display: flex; align-items: center; justify-content: center; }
+    .big-score-text { 
+        font-size: 10rem; font-weight: 900; color: #ffcc00; 
+        transform: scale(0); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .added-score-text {
+        position: absolute; top: -60px; left: -40px;
+        font-size: 4rem; font-weight: 900; color: #ffcc00;
+        opacity: 0; transform: translateY(20px); transition: 0.5s ease-out;
+    }
+    .big-score-text.active { transform: scale(1); }
+    .added-score-text.active { opacity: 1; transform: translateY(0); }
+
+    /* MARKET */
     .market-header { position: absolute; top: 30px; right: 50px; display: flex; align-items: center; gap: 15px; font-size: 24px; font-weight: bold; color: #ffcc00; }
     .market-container { width: 90%; max-height: 85vh; overflow-y: auto; padding: 20px; text-align: center; }
     .market-section-title { font-size: 1.8rem; color: #ffcc00; margin: 40px 0 20px 0; border-bottom: 2px solid #333; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
     .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; margin-bottom: 50px; }
     .market-item { background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 20px; padding: 20px; transition: 0.3s; }
-    .market-item:hover { border-color: #2962ff; background: rgba(255,255,255,0.08); }
     .item-img-preview { width: 80px; height: 80px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #444; object-fit: cover; }
     .frame-preview { border-radius: 50%; border: 4px solid; position: relative; overflow: hidden; }
     .item-name { font-weight: bold; margin-bottom: 5px; font-size: 14px; height: 40px; display: flex; align-items: center; justify-content: center; }
@@ -70,24 +86,11 @@
     .buy-btn:hover { background: #0039cb; }
     .buy-btn.owned { background: #444; cursor: default; }
 
-    /* LOBİ PARÇALARI */
+    /* LOBİ */
     .center-stage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; z-index: 10000; }
     .game-title { color: white; font-size: 4.5rem; margin: 0 0 10px 0; letter-spacing: -2px; pointer-events: none; }
     #world-3d-container { width: 380px; height: 380px; cursor: grab; }
-    #world-3d-container:active { cursor: grabbing; }
-    
-    /* YENİ ŞEFFAF YAZI */
-    .disclaimer-text {
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.4);
-        margin-top: 20px;
-        max-width: 300px;
-        text-align: center;
-        line-height: 1.4;
-        font-style: italic;
-        pointer-events: none;
-        user-select: none;
-    }
+    .disclaimer-text { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); margin-top: 20px; max-width: 300px; text-align: center; line-height: 1.4; font-style: italic; pointer-events: none; user-select: none; }
 
     .side-menu-left { display: flex; flex-direction: column; gap: 20px; margin-left: 50px; z-index: 10000; }
     .mode-card { width: 260px; height: 110px; background: rgba(255, 255, 255, 0.03); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.4s; position: relative; overflow: hidden; }
@@ -100,36 +103,19 @@
     .side-menu-right { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 10000; }
     .panel-box { background: rgba(20, 25, 35, 0.9); padding: 15px 20px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); width: 260px; }
     
-    /* PROFİL SİSTEMİ */
     .mini-profile { cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
-    .mini-profile:hover::after {
-        content: "PROFİLİ DÜZENLE"; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
-        font-size: 16px; font-weight: bold; color: #ffcc00; backdrop-filter: blur(2px);
-    }
     .avatar-wrapper { width: 64px; height: 64px; position: relative; display: flex; align-items: center; justify-content: center; }
     .avatar-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: #333; z-index: 1; }
     .avatar-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; z-index: 2; box-sizing: border-box; }
-    
-    /* ALEV ÇERÇEVESİ ÖZEL EFEKT */
-    .fire-frame { border: 4px solid; border-image: linear-gradient(to top, orange, red) 1; }
-    .fire-frame::before { content: '🔥'; position: absolute; top: 2px; left: 10px; font-size: 10px; }
-    .fire-frame::after { content: '🔥'; position: absolute; top: 5px; right: 12px; font-size: 8px; }
 
-    /* ENVANTER */
     .inventory-section { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 15px; margin-bottom: 20px; text-align: left; border: 1px solid #333; }
     .inventory-title { color: #888; font-size: 12px; margin-bottom: 10px; font-weight: bold; text-transform: uppercase;}
     .inventory-grid { display: flex; gap: 15px; flex-wrap: wrap; }
-    .inv-item { transition: 0.2s; }
-    .inv-item:hover { transform: scale(1.1); }
-
-    /* ÜNVAN ETİKETİ */
     .title-tag { background: #222; border: 1px solid #444; color: #eee; padding: 8px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-    .title-tag:hover { background: #333; border-color: #ffcc00; }
     .title-tag.active { background: #ffcc00; color: #000; font-weight: bold; border-color: #ffcc00; }
 
     /* OYUN UI */
-    .top-bar{ position:absolute;top:20px;left:0;width:100%; display:flex;justify-content:space-between;padding:0 30px;box-sizing:border-box;z-index:1000; visibility: hidden; pointer-events: none; }
+    .top-bar{ position:absolute;top:20px;left:0;width:100%; display:flex;justify-content:space-between;padding:0 30px;box-sizing:border-box;z-index:1000; visibility: hidden; pointer-events: none;}
     .city-box{background:#ffcc00;padding:12px 25px;border-radius:12px;font-weight:bold; color:black; font-size: 20px; pointer-events: auto;}
     .score-box{background:#00c853;color:white;padding:12px 25px;border-radius:12px;font-weight:bold; min-width:140px; text-align:center; pointer-events: auto;}
     .timer-box{ position:absolute;top:20px;left:50%;transform:translateX(-50%); background:#ff3d00;color:white;padding:12px 30px;border-radius:20px; font-weight:bold; font-size: 22px; z-index:1000; visibility: hidden;}
@@ -137,18 +123,24 @@
     .bottom-bar{ position:absolute;bottom:40px;left:50%;transform:translateX(-50%); z-index:1000; visibility: hidden;}
     .guess-btn { padding:16px 60px;font-size:20px;border-radius:40px; background:#2962ff;color:white;cursor:pointer;font-weight:bold; border:none; opacity: 0.4; pointer-events: none; transition: 0.3s; }
     .guess-btn.active { opacity: 1; pointer-events: auto; }
-    .result-box{ position:fixed;top:50%;left:50%;transform:translate(-50%,-50%); background:white;padding:40px;border-radius:24px; z-index:10001; display:none; text-align:center; color: black; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+    .result-box{ position:fixed;top:50%;left:50%;transform:translate(-50%,-50%); background:white;padding:40px;border-radius:24px; z-index:10001; display:none; text-align:center; color: black; }
     .back-btn { padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border-radius: 10px; cursor: pointer; border: 1px solid #444; font-weight: bold;}
-    .back-btn:hover { background: #ff3d00; border-color: #ff3d00; }
     .win-bar { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; display: flex; gap: 2px; padding: 2px; }
     .tick { flex: 1; background: rgba(255,255,255,0.1); border-radius: 2px; }
-    .tick.active { background: #ffcc00; box-shadow: 0 0 5px #ffcc00;}
+    .tick.active { background: #ffcc00; }
 </style>
 </head>
 <body onclick="initFirstAudio()">
 
 <div id="transition-curtain"></div>
 <div id="music-toggle" onclick="toggleGlobalMusic(event)">🔊</div>
+
+<div id="score-animation-overlay">
+    <div class="score-anim-container">
+        <div id="anim-added-score" class="added-score-text">+0</div>
+        <div id="anim-main-score" class="big-score-text">0</div>
+    </div>
+</div>
 
 <div id="start-countdown-overlay">
     <div style="font-size: 2.5rem; font-weight: 800; color: #ffcc00; margin-bottom: 20px;">OYUNUN BAŞLAMASINA</div>
@@ -157,59 +149,25 @@
 
 <div id="main-menu">
     <div class="side-menu-left">
-        <div class="mode-card" onclick="startCountdown('normal')">
-            <span class="mode-title">🌍 DÜNYA MODU</span>
-            <span class="mode-desc">Klasik deneyim. Hedef 25.000 puan.</span>
-        </div>
-        <div class="mode-card" onclick="startCountdown('speedrun')">
-            <span class="mode-title">⏱️ SÜRELİ MOD</span>
-            <span class="mode-desc">500km altına inersen süre 1 dakikaya sıfırlanır!</span>
-        </div>
-        <div class="mode-card" onclick="startCountdown('hardcore')">
-            <span class="mode-title">🧭 ZOR MOD</span>
-            <span class="mode-desc">Hata payı yok (500km sınır).</span>
-        </div>
-        <div class="mode-card" onclick="openChallenges()">
-            <span class="mode-title">📚 MEYDAN OKUMALAR</span>
-            <span class="mode-desc">Özel ödüller ve madalyalar kazan.</span>
-        </div>
+        <div class="mode-card" onclick="startCountdown('normal')"><span class="mode-title">🌍 DÜNYA MODU</span><span class="mode-desc">Klasik deneyim. Hedef 25.000 puan.</span></div>
+        <div class="mode-card" onclick="startCountdown('speedrun')"><span class="mode-title">⏱️ SÜRELİ MOD</span><span class="mode-desc">500km altına inersen süre 1 dakikaya sıfırlanır!</span></div>
+        <div class="mode-card" onclick="startCountdown('hardcore')"><span class="mode-title">🧭 ZOR MOD</span><span class="mode-desc">Hata payı yok (500km sınır).</span></div>
+        <div class="mode-card" onclick="openChallenges()"><span class="mode-title">📚 MEYDAN OKUMALAR</span><span class="mode-desc">Özel ödüller ve madalyalar kazan.</span></div>
     </div>
-
     <div class="center-stage">
         <h1 class="game-title">Week.world</h1>
         <div id="world-3d-container"></div>
-        <div class="disclaimer-text">
-            Oyunumuz tamamıyla eğlence amaçlıdır herhangi bir para kazanma gibi bir amacımız yoktur!
-        </div>
+        <div class="disclaimer-text">Oyunumuz tamamıyla eğlence amaçlıdır herhangi bir para kazanma gibi bir amacımız yoktur!</div>
     </div>
-
     <div class="side-menu-right">
         <div class="panel-box mini-profile" onclick="openProfileEdit()">
             <div style="display:flex; align-items:center; gap:15px;">
-                <div class="avatar-wrapper">
-                    <img src="" id="display-avatar" class="avatar-img">
-                    <div id="display-frame" class="avatar-frame"></div>
-                </div>
-                <div>
-                    <div id="display-name" style="font-weight:bold;">Oyuncu</div>
-                    <div id="display-title" style="font-size:10px; color:#ffcc00;">YENİ OYUNCU</div>
-                </div>
+                <div class="avatar-wrapper"><img src="" id="display-avatar" class="avatar-img"><div id="display-frame" class="avatar-frame"></div></div>
+                <div><div id="display-name" style="font-weight:bold;">Oyuncu</div><div id="display-title" style="font-size:10px; color:#ffcc00;">YENİ OYUNCU</div></div>
             </div>
         </div>
-        <div class="panel-box">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-                <span id="rank-emoji" style="font-size:36px;">⛓️</span>
-                <div>
-                    <div style="font-size: 10px; color: #888;">RANK</div>
-                    <div id="rank-name" style="font-weight:bold;">Demir</div>
-                </div>
-            </div>
-            <div class="win-bar" id="win-ticks"></div>
-        </div>
-        <div class="panel-box">
-            <div style="font-size: 10px; color: #888;">TOPLAM OYNAMA SÜRESİ</div>
-            <div id="playtime-display" style="font-size: 14px; font-weight: bold; color: #ffcc00; margin-top: 5px;">0 Gün 0 Saat 0 Dakika</div>
-        </div>
+        <div class="panel-box"><div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;"><span id="rank-emoji" style="font-size:36px;">⛓️</span><div><div style="font-size: 10px; color: #888;">RANK</div><div id="rank-name" style="font-weight:bold;">Demir</div></div></div><div class="win-bar" id="win-ticks"></div></div>
+        <div class="panel-box"><div style="font-size: 10px; color: #888;">TOPLAM OYNAMA SÜRESİ</div><div id="playtime-display" style="font-size: 14px; font-weight: bold; color: #ffcc00; margin-top: 5px;">0 Gün 0 Saat 0 Dakika</div></div>
         <button class="buy-btn" style="height:50px; font-size:16px; background: linear-gradient(45deg, #6200ea, #2962ff);" onclick="openMarket()">🛒 MARKET</button>
     </div>
 </div>
@@ -230,51 +188,26 @@
 <div id="challenge-menu">
     <h2 style="font-size: 3rem;">Meydan Okumalar</h2>
     <div style="display:flex; gap:20px; margin-top: 20px;">
-        <div class="mode-card" onclick="startCountdown('total_time')">
-            <span class="mode-title">⏳ TOPLAM SÜRE</span>
-            <span class="mode-desc">25.000 puan için toplam 2 dakikan var!</span>
-        </div>
-        <div class="mode-card" onclick="startCountdown('blind_shot')">
-            <span class="mode-title">🌑 KÖR ATIŞ</span>
-            <span class="mode-desc">Sınırsız harita, 500km sınır ve 3 dk!</span>
-        </div>
+        <div class="mode-card" onclick="startCountdown('total_time')"><span class="mode-title">⏳ TOPLAM SÜRE</span><span class="mode-desc">25.000 puan için toplam 2 dakikan var!</span></div>
+        <div class="mode-card" onclick="startCountdown('blind_shot')"><span class="mode-title">🌑 KÖR ATIŞ</span><span class="mode-desc">Sınırsız harita, 500km sınır ve 3 dk!</span></div>
     </div>
-    <div class="panel-box" style="margin-top:40px; width: auto; padding: 15px 40px; text-align: center;">
-        🏆 MADALYALAR: <span id="challenge-medal-count" style="font-weight:bold; color:#ffcc00; font-size: 24px;">0</span>
-    </div>
+    <div class="panel-box" style="margin-top:40px; width: auto; padding: 15px 40px; text-align: center;">🏆 MADALYALAR: <span id="challenge-medal-count" style="font-weight:bold; color:#ffcc00; font-size: 24px;">0</span></div>
     <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeChallenges()">← GERİ</button>
 </div>
 
 <div id="profile-edit-menu" style="background: rgba(15, 15, 20, 0.95); border: 1px solid #333; width: 700px; padding: 40px; border-radius: 20px; text-align: center; margin: auto; max-height: 80vh; overflow-y: auto;">
     <h2 style="margin-top: 0; color: #ffcc00;">Profil ve Envanter</h2>
-    <div style="margin-bottom: 30px;">
-        <div class="inventory-title">KULLANICI ADI</div>
-        <input type="text" id="name-input" placeholder="İsim Değiştir" style="padding:15px; border-radius:10px; border: 1px solid #444; background: rgba(0,0,0,0.5); color: white; width:80%; font-size: 16px; text-align: center;">
-    </div>
-    <div class="inventory-section">
-        <div class="inventory-title">SAHİP OLUNAN ÜNVANLAR (Kuşanmak İçin Tıkla)</div>
-        <div class="inventory-grid" id="inv-titles" style="justify-content: center;"></div>
-    </div>
-    <div class="inventory-section">
-        <div class="inventory-title">SAHİP OLUNAN AVATARLAR</div>
-        <div class="inventory-grid" id="inv-avatars"></div>
-    </div>
-    <div class="inventory-section">
-        <div class="inventory-title">SAHİP OLUNAN ÇERÇEVELER</div>
-        <div class="inventory-grid" id="inv-frames"></div>
-    </div>
+    <div style="margin-bottom: 30px;"><div class="inventory-title">KULLANICI ADI</div><input type="text" id="name-input" placeholder="İsim Değiştir" style="padding:15px; border-radius:10px; border: 1px solid #444; background: rgba(0,0,0,0.5); color: white; width:80%; font-size: 16px; text-align: center;"></div>
+    <div class="inventory-section"><div class="inventory-title">SAHİP OLUNAN ÜNVANLAR</div><div class="inventory-grid" id="inv-titles" style="justify-content: center;"></div></div>
+    <div class="inventory-section"><div class="inventory-title">SAHİP OLUNAN AVATARLAR</div><div class="inventory-grid" id="inv-avatars"></div></div>
+    <div class="inventory-section"><div class="inventory-title">SAHİP OLUNAN ÇERÇEVELER</div><div class="inventory-grid" id="inv-frames"></div></div>
     <button class="back-btn" style="margin-top: 20px; width: 200px; background: #2962ff; border: none;" onclick="closeProfileEdit()">KAYDET VE ÇIK</button>
 </div>
 
-<div class="top-bar" id="game-top-bar">
-    <div class="city-box">Hedef: <span id="cityName">Şehir</span></div>
-    <div class="score-box">Puan: <span id="score">0</span></div>
-</div>
+<div class="top-bar" id="game-top-bar"><div class="city-box">Hedef: <span id="cityName">Şehir</span></div><div class="score-box">Puan: <span id="score">0</span></div></div>
 <div class="timer-box" id="timer">02:00</div>
 <div class="distance-box" id="distanceBox"></div>
-<div class="bottom-bar" id="game-bottom-bar">
-    <button class="guess-btn" id="guessBtn" onclick="makeGuess()">TAHMİN ET</button>
-</div>
+<div class="bottom-bar" id="game-bottom-bar"><button class="guess-btn" id="guessBtn" onclick="makeGuess()">TAHMİN ET</button></div>
 <div class="result-box" id="result"></div>
 <div id="map"></div>
 
@@ -283,17 +216,7 @@
 let wins = parseInt(localStorage.getItem('weekWorldWins')) || 0;
 let medals = parseInt(localStorage.getItem('weekWorldMedals')) || 0;
 let totalSeconds = parseInt(localStorage.getItem('weekWorldPlaytime')) || 0;
-
-let profileData = JSON.parse(localStorage.getItem('weekWorldProfile')) || {
-    name: "Oyuncu",
-    title: "YENİ OYUNCU",
-    avatar: "https://i.ibb.co/vz6mXmX/default-avatar.png",
-    frame: "",
-    ownedAvatars: ["https://i.ibb.co/vz6mXmX/default-avatar.png"],
-    ownedFrames: [],
-    ownedTitles: ["YENİ OYUNCU", "GEZGİN"]
-};
-
+let profileData = JSON.parse(localStorage.getItem('weekWorldProfile')) || { name: "Oyuncu", title: "YENİ OYUNCU", avatar: "https://i.ibb.co/vz6mXmX/default-avatar.png", frame: "", ownedAvatars: ["https://i.ibb.co/vz6mXmX/default-avatar.png"], ownedFrames: [], ownedTitles: ["YENİ OYUNCU", "GEZGİN"] };
 /* --- SES MOTORU --- */
 let audioCtx = null, musicLoopInterval = null, currentMusicType = null;
 let isMusicMuted = localStorage.getItem('weekWorldMuted') === 'true';
@@ -323,68 +246,136 @@ function toggleGlobalMusic(event) {
     }
 }
 
-function stopMusic() {
-    if (musicLoopInterval) { clearInterval(musicLoopInterval); musicLoopInterval = null; }
-    currentMusicType = null;
-}
+function stopMusic() { if (musicLoopInterval) { clearInterval(musicLoopInterval); musicLoopInterval = null; } currentMusicType = null; }
 
 function startLobbyMusic() {
     if (isMusicMuted || currentMusicType === 'lobby') return;
     stopMusic(); currentMusicType = 'lobby';
-    const masterGain = audioCtx.createGain();
-    masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
-    masterGain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 2);
-    masterGain.connect(audioCtx.destination);
+    const masterGain = audioCtx.createGain(); masterGain.gain.setValueAtTime(0, audioCtx.currentTime); masterGain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 2); masterGain.connect(audioCtx.destination);
     let step = 0;
-    musicLoopInterval = setInterval(() => {
-        if (isMusicMuted) return;
-        const now = audioCtx.currentTime;
-        const chords = [130.81, 174.61, 196.00, 130.81];
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.frequency.setValueAtTime(chords[Math.floor(step / 4) % 4], now);
-        g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(0.05, now + 1);
-        g.gain.linearRampToValueAtTime(0, now + 3);
-        osc.connect(g); g.connect(masterGain);
-        osc.start(now); osc.stop(now + 4);
-        step++;
-    }, 1000);
+    musicLoopInterval = setInterval(() => { if (isMusicMuted) return; const now = audioCtx.currentTime; const chords = [130.81, 174.61, 196.00, 130.81]; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.frequency.setValueAtTime(chords[Math.floor(step / 4) % 4], now); g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.05, now + 1); g.gain.linearRampToValueAtTime(0, now + 3); osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now + 4); step++; }, 1000);
 }
 
 function startGameMusic() {
     if (isMusicMuted || currentMusicType === 'game') return;
     stopMusic(); currentMusicType = 'game';
-    const masterGain = audioCtx.createGain();
-    masterGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    masterGain.connect(audioCtx.destination);
+    const masterGain = audioCtx.createGain(); masterGain.gain.setValueAtTime(0.1, audioCtx.currentTime); masterGain.connect(audioCtx.destination);
     let step = 0;
-    musicLoopInterval = setInterval(() => {
-        if (isMusicMuted) return;
-        const now = audioCtx.currentTime;
-        const arpeggio = [261.63, 329.63, 392.00, 523.25];
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(arpeggio[step % 4], now);
-        g.gain.setValueAtTime(0.04, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-        osc.connect(g); g.connect(masterGain);
-        osc.start(now); osc.stop(now + 0.2);
-        step++;
-    }, 250);
+    musicLoopInterval = setInterval(() => { if (isMusicMuted) return; const now = audioCtx.currentTime; const arpeggio = [261.63, 329.63, 392.00, 523.25]; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(arpeggio[step % 4], now); g.gain.setValueAtTime(0.04, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.2); osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now + 0.2); step++; }, 250);
 }
 
-/* --- MARKET VE ENVANTER SİSTEMİ --- */
+// Dürbün Yakınlaştırma Sesi (Minecraft Tarzı Klik)
+function playBinocularSound() {
+    if (isMusicMuted || !audioCtx) return;
+    const now = audioCtx.currentTime;
+    // Minecraft dürbün açma sesine benzer keskin klik ve hafif tiz metalik tınlama
+    const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    osc.type = 'square'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+    g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(); osc.stop(now + 0.15);
+}
+
+// Rüzgar Sesi
+function playWindSound(duration) {
+    if (isMusicMuted || !audioCtx) return;
+    const bufferSize = audioCtx.sampleRate * duration;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+    const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + duration/2);
+    const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.2); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+    noise.connect(filter); filter.connect(gain);
+    gain.connect(audioCtx.destination); noise.start();
+}
+
+// Saat Sesi (Tik / Tak)
+function playClockTick(isTak = false) {
+    if (isMusicMuted || !audioCtx) return;
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.setValueAtTime(isTak ? 200 : 400, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+}
+
+// Puan Artış Sesi (Minecraft Tecrübe Puanı Tarzı)
+function playScoreTick() {
+    if (isMusicMuted || !audioCtx) return;
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.setValueAtTime(600 + (Math.random()*400), audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+}
+
+/* --- YENİ PUAN ANİMASYON MANTIĞI --- */
+function animateScoreWithOverlay(roundScore) {
+    const overlay = document.getElementById('score-animation-overlay');
+    const mainScoreTxt = document.getElementById('anim-main-score');
+    const addedScoreTxt = document.getElementById('anim-added-score');
+    const panelScore = document.getElementById('score');
+
+    const oldTotal = score - roundScore;
+    const targetTotal = score;
+
+    // 1. Ekranı hazırla ve eski puanı devasa getir
+    mainScoreTxt.innerText = oldTotal;
+    addedScoreTxt.innerText = "+" + roundScore;
+    overlay.style.display = 'flex';
+    
+    setTimeout(() => {
+        mainScoreTxt.classList.add('active');
+        
+        // 2. 1 saniye sonra +3000 yazısı belirsin
+        setTimeout(() => {
+            addedScoreTxt.classList.add('active');
+
+            // 3. Puan artışı başlasın (hem ekranda hem panelde)
+            let current = oldTotal;
+            const steps = 30;
+            const inc = roundScore / steps;
+            let step = 0;
+
+            const int = setInterval(() => {
+                step++;
+                current = Math.floor(oldTotal + (inc * step));
+                if(step >= steps) {
+                    current = targetTotal;
+                    clearInterval(int);
+                    
+                    // 4. +3000 yazısı kaybolsun
+                    setTimeout(() => {
+                        addedScoreTxt.classList.remove('active');
+                        // 5. 1.5 saniye sonra dev puan kaybolsun ve mola başlasın
+                        setTimeout(() => {
+                            mainScoreTxt.classList.remove('active');
+                            setTimeout(() => {
+                                overlay.style.display = 'none';
+                                startMola();
+                            }, 500);
+                        }, 1500);
+                    }, 1000);
+                }
+                mainScoreTxt.innerText = current;
+                panelScore.innerText = current;
+                playScoreTick();
+            }, 50);
+
+        }, 1000);
+    }, 100);
+}
+
+/* --- MARKET VE ENVANTER --- */
 const createSVG = (color, text) => `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23${color}'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='white' font-family='Arial' font-weight='bold' text-anchor='middle' dy='.3em'%3E${text}%3C/text%3E%3C/svg%3E`;
 const createSpecialSVG = (bg, emoji) => `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='${bg}'/%3E%3Ctext x='50%25' y='50%25' font-size='60' text-anchor='middle' dy='.35em'%3E${emoji}%3C/text%3E%3C/svg%3E`;
-
 const coloredProducts = [
     { id: 'p_blue', type: 'photo', name: 'Mavi Profil Fotoğrafı', price: 8, url: createSVG('2962ff', 'Mavi') },
     { id: 'p_green', type: 'photo', name: 'Yeşil Profil Fotoğrafı', price: 8, url: createSVG('00c853', 'Yeşil') },
     { id: 'p_red', type: 'photo', name: 'Kırmızı Profil Fotoğrafı', price: 8, url: createSVG('ff3d00', 'Kırmızı') },
     { id: 'p_world', type: 'photo', name: 'Dünya', price: 12, url: createSpecialSVG('black', '🌍') },
-    { id: 'p_fire', type: 'photo', name: 'Ateş', price: 12, url: "" }, 
+    { id: 'p_fire', type: 'photo', name: 'Ateş', price: 12, url: createSpecialSVG('orange', '🔥') },
     { id: 'f_fire', type: 'frame', name: 'Alev Çerçevesi', price: 12, color: 'fire_gradient' },
     { id: 'f_blue', type: 'frame', name: 'Mavi Avatar Çerçevesi', price: 10, color: '#2962ff' },
     { id: 'f_green', type: 'frame', name: 'Yeşil Avatar Çerçevesi', price: 10, color: '#00c853' },
@@ -393,100 +384,41 @@ const coloredProducts = [
     { id: 't_first', type: 'title', name: 'Birinci', price: 8, titleColor: '#00ffff' }
 ];
 
-coloredProducts.find(p => p.id === 'p_fire').url = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:orange;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:red;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='150' height='150' fill='url(%23g)'/%3E%3Ctext x='50%25' y='50%25' font-size='60' text-anchor='middle' dy='.35em'%3E🔥%3C/text%3E%3C/svg%3E`;
-
 function initMarket() {
-    const photoGrid = document.getElementById('market-grid-photos');
-    const frameGrid = document.getElementById('market-grid-frames');
-    const titleGrid = document.getElementById('market-grid-titles');
-    photoGrid.innerHTML = ''; frameGrid.innerHTML = ''; titleGrid.innerHTML = '';
-    coloredProducts.forEach(product => {
-        let isOwned = (product.type === 'photo' ? profileData.ownedAvatars.includes(product.url) : product.type === 'frame' ? profileData.ownedFrames.includes(product.color) : product.type === 'title' ? profileData.ownedTitles.includes(product.name) : false);
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'market-item';
-        let previewHTML = "";
-        if(product.type === 'frame') {
-            let style = product.color === 'fire_gradient' ? "border-image: linear-gradient(to top, orange, red) 1; border-style: solid;" : `border-color: ${product.color};`;
-            let extraClass = product.color === 'fire_gradient' ? "fire-frame" : "";
-            previewHTML = `<div class="item-img-preview frame-preview ${extraClass}" style="${style} margin:auto;"></div>`;
-        } else if(product.type === 'photo') {
-            previewHTML = `<img src="${product.url}" class="item-img-preview" style="margin:auto;">`;
-        } else {
-            previewHTML = `<div style="color:${product.titleColor}; font-weight:bold; height:80px; display:flex; align-items:center; justify-content:center;">${product.name}</div>`;
-        }
-        itemDiv.innerHTML = `${previewHTML}<div class="item-name">${product.type === 'title' ? '' : product.name}</div><div class="item-price">🏆 ${product.price}</div><button class="buy-btn ${isOwned ? 'owned' : ''}" onclick="buyProduct('${product.id}')">${isOwned ? 'SAHİPSİN' : 'SATIN AL'}</button>`;
-        if(product.type === 'photo') photoGrid.appendChild(itemDiv); else if(product.type === 'frame') frameGrid.appendChild(itemDiv); else if(product.type === 'title') titleGrid.appendChild(itemDiv);
+    const grids = { photo: document.getElementById('market-grid-photos'), frame: document.getElementById('market-grid-frames'), title: document.getElementById('market-grid-titles') };
+    Object.values(grids).forEach(g => g.innerHTML = '');
+    coloredProducts.forEach(p => {
+        let isOwned = (p.type === 'photo' ? profileData.ownedAvatars.includes(p.url) : p.type === 'frame' ? profileData.ownedFrames.includes(p.color) : profileData.ownedTitles.includes(p.name));
+        const div = document.createElement('div'); div.className = 'market-item'; let preview = "";
+        if(p.type === 'frame') preview = `<div class="item-img-preview frame-preview ${p.color === 'fire_gradient' ? 'fire-frame' : ''}" style="${p.color !== 'fire_gradient' ? 'border-color:'+p.color : ''}; margin:auto;"></div>`;
+        else if(p.type === 'photo') preview = `<img src="${p.url}" class="item-img-preview" style="margin:auto;">`;
+        else preview = `<div style="color:${p.titleColor}; font-weight:bold; height:80px; display:flex; align-items:center; justify-content:center;">${p.name}</div>`;
+        div.innerHTML = `${preview}<div class="item-name">${p.type === 'title' ? '' : p.name}</div><div class="item-price">🏆 ${p.price}</div><button class="buy-btn ${isOwned ? 'owned' : ''}" onclick="buyProduct('${p.id}')">${isOwned ? 'SAHİPSİN' : 'SATIN AL'}</button>`;
+        grids[p.type].appendChild(div);
     });
 }
 
-function buyProduct(productId) {
-    const product = coloredProducts.find(p => p.id === productId);
-    let isOwned = (product.type === 'photo' ? profileData.ownedAvatars.includes(product.url) : product.type === 'frame' ? profileData.ownedFrames.includes(product.color) : product.type === 'title' ? profileData.ownedTitles.includes(product.name) : false);
-    if(isOwned) return;
-    if(medals >= product.price) {
-        medals -= product.price;
-        if(product.type === 'photo') { profileData.ownedAvatars.push(product.url); profileData.avatar = product.url; } 
-        else if(product.type === 'frame') { profileData.ownedFrames.push(product.color); profileData.frame = product.color; }
-        else if(product.type === 'title') { profileData.ownedTitles.push(product.name); profileData.title = product.name; }
-        localStorage.setItem('weekWorldMedals', medals);
-        saveProfile(); updateUI(); renderInventory(); initMarket();
-    }
+function buyProduct(id) {
+    const p = coloredProducts.find(x => x.id === id); if(!p || medals < p.price) return;
+    medals -= p.price; if(p.type === 'photo') profileData.ownedAvatars.push(p.url); else if(p.type === 'frame') profileData.ownedFrames.push(p.color); else profileData.ownedTitles.push(p.name);
+    localStorage.setItem('weekWorldMedals', medals); saveProfile(); updateUI(); renderInventory(); initMarket();
 }
 
 function renderInventory() {
-    const avGrid = document.getElementById('inv-avatars'), frGrid = document.getElementById('inv-frames'), tiGrid = document.getElementById('inv-titles');
-    avGrid.innerHTML = ''; frGrid.innerHTML = ''; tiGrid.innerHTML = '';
-    profileData.ownedTitles.forEach(t => {
-        const span = document.createElement('div');
-        span.className = `title-tag ${profileData.title === t ? 'active' : ''}`;
-        span.innerText = t; span.onclick = () => { profileData.title = t; renderInventory(); updateUI(); }; tiGrid.appendChild(span);
-    });
-    profileData.ownedAvatars.forEach(url => {
-        let img = document.createElement('img'); img.src = url; img.className = 'inv-item';
-        img.style.cssText = `width:60px; height:60px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.avatar === url ? '#ffcc00' : 'transparent'};`;
-        img.onclick = () => { profileData.avatar = url; updateUI(); renderInventory(); }; avGrid.appendChild(img);
-    });
-    let noFrame = document.createElement('div'); noFrame.className = 'inv-item';
-    noFrame.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.frame === '' ? '#ffcc00' : '#444'}; display:flex; align-items:center; justify-content:center; font-size: 20px; background: rgba(0,0,0,0.5);`;
-    noFrame.innerHTML = '❌'; noFrame.onclick = () => { profileData.frame = ''; updateUI(); renderInventory(); }; frGrid.appendChild(noFrame);
-    profileData.ownedFrames.forEach(color => {
-        let div = document.createElement('div'); div.className = 'inv-item ' + (color === 'fire_gradient' ? 'fire-frame' : '');
-        let style = color === 'fire_gradient' ? "border-image: linear-gradient(to top, orange, red) 1; border-style: solid; position: relative;" : `border: 4px solid ${color};`;
-        div.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; ${style} box-shadow: ${profileData.frame === color ? '0 0 15px orange' : 'none'};`;
-        div.onclick = () => { profileData.frame = color; updateUI(); renderInventory(); }; frGrid.appendChild(div);
-    });
+    const grids = { av: document.getElementById('inv-avatars'), fr: document.getElementById('inv-frames'), ti: document.getElementById('inv-titles') }; Object.values(grids).forEach(g => g.innerHTML = '');
+    profileData.ownedTitles.forEach(t => { const span = document.createElement('div'); span.className = `title-tag ${profileData.title === t ? 'active' : ''}`; span.innerText = t; span.onclick = () => { profileData.title = t; renderInventory(); updateUI(); }; grids.ti.appendChild(span); });
+    profileData.ownedAvatars.forEach(url => { let img = document.createElement('img'); img.src = url; img.className = 'inv-item'; img.style.cssText = `width:60px; height:60px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.avatar === url ? '#ffcc00' : 'transparent'};`; img.onclick = () => { profileData.avatar = url; updateUI(); renderInventory(); }; grids.av.appendChild(img); });
+    let noFr = document.createElement('div'); noFr.className = 'inv-item'; noFr.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.frame === '' ? '#ffcc00' : '#444'}; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5);`; noFr.innerHTML = '❌'; noFr.onclick = () => { profileData.frame = ''; updateUI(); renderInventory(); }; grids.fr.appendChild(noFr);
+    profileData.ownedFrames.forEach(c => { let div = document.createElement('div'); div.className = 'inv-item ' + (c === 'fire_gradient' ? 'fire-frame' : ''); div.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; ${c === 'fire_gradient' ? '' : 'border:4px solid '+c}; box-shadow: ${profileData.frame === c ? '0 0 15px orange' : 'none'};`; div.onclick = () => { profileData.frame = c; updateUI(); renderInventory(); }; grids.fr.appendChild(div); });
 }
 
 function updateUI() {
-    if(wins >= 60 && !profileData.ownedTitles.includes("Altın Oyuncu")) { profileData.ownedTitles.push("Altın Oyuncu"); saveProfile(); }
-    document.getElementById('market-medal-count').innerText = medals;
-    document.getElementById('challenge-medal-count').innerText = medals;
-    document.getElementById('display-name').innerText = profileData.name;
-    document.getElementById('display-avatar').src = profileData.avatar;
-    const frameEl = document.getElementById('display-frame');
-    frameEl.className = "avatar-frame";
-    if(profileData.frame === 'fire_gradient') {
-        frameEl.classList.add('fire-frame');
-        frameEl.style.border = "none";
-        frameEl.style.borderImage = "linear-gradient(to top, orange, red) 1";
-        frameEl.style.borderStyle = "solid";
-        frameEl.style.borderWidth = "4px";
-    } else {
-        frameEl.style.border = profileData.frame ? `4px solid ${profileData.frame}` : 'none';
-        frameEl.style.borderImage = "none";
-    }
-    document.getElementById('display-title').innerText = profileData.title;
-    document.getElementById('name-input').value = profileData.name;
-    const ticksContainer = document.getElementById('win-ticks');
-    let emoji = wins < 20 ? "⛓️" : wins < 40 ? "🥈" : wins < 60 ? "🥇" : "💎";
-    let rName = wins < 20 ? "Demir" : wins < 40 ? "Gümüş" : wins < 60 ? "Altın" : "Elmas";
-    document.getElementById('rank-emoji').innerText = emoji;
-    document.getElementById('rank-name').innerText = rName;
-    ticksContainer.innerHTML = '';
-    for(let i=0; i<20; i++) {
-        let t = document.createElement('div'); t.className = 'tick' + (i < (wins % 20) ? ' active' : '');
-        ticksContainer.appendChild(t);
-    }
+    document.getElementById('market-medal-count').innerText = medals; document.getElementById('challenge-medal-count').innerText = medals; document.getElementById('display-name').innerText = profileData.name; document.getElementById('display-avatar').src = profileData.avatar;
+    const f = document.getElementById('display-frame'); f.className = "avatar-frame"; if(profileData.frame === 'fire_gradient') f.classList.add('fire-frame'); else f.style.border = profileData.frame ? `4px solid ${profileData.frame}` : 'none';
+    document.getElementById('display-title').innerText = profileData.title; document.getElementById('name-input').value = profileData.name;
+    let emoji = wins < 20 ? "⛓️" : wins < 40 ? "🥈" : wins < 60 ? "🥇" : "💎"; document.getElementById('rank-emoji').innerText = emoji;
+    document.getElementById('rank-name').innerText = wins < 20 ? "Demir" : wins < 40 ? "Gümüş" : wins < 60 ? "Altın" : "Elmas";
+    const ticks = document.getElementById('win-ticks'); ticks.innerHTML = ''; for(let i=0; i<20; i++) { let t = document.createElement('div'); t.className = 'tick' + (i < (wins % 20) ? ' active' : ''); ticks.appendChild(t); }
 }
 
 function saveProfile() { localStorage.setItem('weekWorldProfile', JSON.stringify(profileData)); }
@@ -497,37 +429,30 @@ function closeChallenges() { document.getElementById('challenge-menu').style.dis
 function openProfileEdit() { document.getElementById('profile-edit-menu').style.display = 'flex'; renderInventory(); }
 function closeProfileEdit() { profileData.name = document.getElementById('name-input').value || profileData.name; saveProfile(); updateUI(); document.getElementById('profile-edit-menu').style.display = 'none'; }
 
-/* --- ŞEHİR VERİLERİ (64 ŞEHİR) --- */
+/* --- ŞEHİRLER --- */
 var citiesEasy = [["İstanbul", 41.00, 28.97], ["Ankara", 39.93, 32.85], ["İzmir", 38.41, 27.12], ["Antalya", 36.89, 30.71], ["Londra", 51.50, -0.12], ["Paris", 48.85, 2.35], ["Berlin", 52.52, 13.40], ["Roma", 41.90, 12.49], ["Madrid", 40.41, -3.70], ["Tokyo", 35.67, 139.65], ["New York", 40.71, -74.00], ["Sidney", -33.86, 151.20], ["Moskova", 55.75, 37.61], ["Dubai", 25.20, 55.27], ["Amsterdam", 52.36, 4.89], ["Brüksel", 50.85, 4.35], ["Viyana", 48.20, 16.37], ["Atina", 37.98, 23.72], ["Kahire", 30.04, 31.23], ["Pekin", 39.90, 116.40], ["Seul", 37.56, 126.97], ["Rio de Janeiro", -22.90, -43.17], ["Buenos Aires", -34.60, -58.38], ["Toronto", 43.65, -79.38], ["Los Angeles", 34.05, -118.24], ["Meksika City", 19.43, -99.13], ["Bangkok", 13.75, 100.50], ["Singapur", 1.35, 103.81], ["Lizbon", 38.72, -9.13], ["Stokholm", 59.32, 18.06]];
 var citiesHard = [["Varşova", 52.22, 21.01], ["Prag", 50.07, 14.43], ["Budapeşte", 47.49, 19.04], ["Cape Town", -33.92, 18.42], ["Helsinki", 60.16, 24.93], ["Oslo", 59.91, 10.75], ["Kopenhag", 55.67, 12.56], ["Zürih", 47.37, 8.54], ["Dublin", 53.34, -6.26], ["Reykjavik", 64.12, -21.82], ["Yeni Delhi", 28.61, 77.20], ["Kuala Lumpur", 3.13, 101.68], ["Manila", 14.59, 120.98], ["Cakarta", -6.20, 106.84], ["Santiago", -33.44, -70.66], ["Lima", -12.04, -77.04], ["Bogota", 4.71, -74.07], ["Hanoi", 21.02, 105.83], ["Taipei", 25.03, 121.56], ["Bükreş", 44.42, 26.10], ["Belgrad", 44.78, 20.44], ["Sofya", 42.69, 23.32], ["Lagos", 6.52, 3.37], ["Nairobi", -1.29, 36.82], ["Kazablanka", 33.57, -7.58], ["Bakü", 40.40, 49.86], ["Tiflis", 41.71, 44.78], ["Astana", 51.16, 71.47], ["Amman", 31.94, 35.92], ["Beyrut", 33.89, 35.50], ["Riyad", 24.71, 46.67], ["Tel Aviv", 32.08, 34.78], ["Kiev", 50.45, 30.52], ["Perth", -31.95, 115.86]];
 
-/* --- OYUN MANTIĞI VE ANİMASYONLAR --- */
+/* --- OYUN MANTIĞI --- */
 var map = L.map('map', {zoomControl: false, attributionControl: false, worldCopyJump: true}).setView([20,0], 3);
 var baseLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 var blindLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png');
 var selectedCity, guessMarker=null, realMarker=null, line=null, score=0, timeLeft=120, roundActive=false, currentMode='normal', timerInterval, nextRoundInterval;
 
 function startCountdown(mode) {
-    currentMode = mode;
-    document.getElementById('main-menu').style.visibility = 'hidden';
-    document.getElementById('challenge-menu').style.display = 'none';
-    document.getElementById('music-toggle').style.display = 'none';
-    const overlay = document.getElementById('start-countdown-overlay');
-    overlay.style.display = 'flex';
-    stopMusic();
+    currentMode = mode; document.getElementById('main-menu').style.visibility = 'hidden'; document.getElementById('challenge-menu').style.display = 'none'; document.getElementById('music-toggle').style.display = 'none';
+    const overlay = document.getElementById('start-countdown-overlay'); overlay.style.display = 'flex'; stopMusic();
     let c = 5; document.getElementById('countdown-num').innerText = c;
-    let int = setInterval(() => {
-        c--;
-        if(c > 0) document.getElementById('countdown-num').innerText = c;
-        else { 
-            clearInterval(int); 
-            overlay.classList.add('slide-up-out'); 
-            setTimeout(() => { 
-                overlay.style.display='none'; 
-                if(!isMusicMuted) startGameMusic(); 
-                startGame(); 
-            }, 600); 
-        }
+    let int = setInterval(() => { 
+        c--; 
+        if(c > 0) {
+            document.getElementById('countdown-num').innerText = c;
+            playClockTick(c % 2 === 0);
+        } else { 
+            clearInterval(int); overlay.classList.add('slide-up-out'); 
+            setTimeout(() => { overlay.style.display='none'; 
+            if(!isMusicMuted) startGameMusic(); startGame(); }, 600); 
+        } 
     }, 1000);
 }
 
@@ -536,36 +461,26 @@ function startGame() {
     document.getElementById('game-top-bar').style.visibility = 'visible';
     document.getElementById('game-bottom-bar').style.visibility = 'visible';
     document.getElementById('timer').style.visibility = (currentMode === 'hardcore' ? 'hidden' : 'visible');
-    if(currentMode === 'blind_shot') { map.removeLayer(baseLayer); blindLayer.addTo(map); timeLeft = 180; }
-    else { map.removeLayer(blindLayer); baseLayer.addTo(map); }
+    if(currentMode === 'blind_shot') { map.removeLayer(baseLayer); blindLayer.addTo(map); timeLeft = 180; } else { map.removeLayer(blindLayer); baseLayer.addTo(map); }
     startRound(true);
 }
 
 function startRound(first = false) {
     if(score >= 25000) { showFinalScreen(); return; }
-    if(guessMarker) map.removeLayer(guessMarker); if(realMarker) map.removeLayer(realMarker); if(line) map.removeLayer(line);
+    if(guessMarker) map.removeLayer(guessMarker);
+    if(realMarker) map.removeLayer(realMarker); if(line) map.removeLayer(line);
     guessMarker = null; document.getElementById("guessBtn").classList.remove("active");
     document.getElementById("distanceBox").style.display="none"; document.getElementById("guessBtn").style.display="block";
     if(currentMode === 'speedrun' && first) timeLeft = 60;
     else if(currentMode === 'normal') timeLeft = 120;
-    let pool = Math.random() < 0.5 ? citiesEasy : citiesHard;
-    selectedCity = pool[Math.floor(Math.random()*pool.length)];
-    document.getElementById("cityName").innerText = selectedCity[0];
-    roundActive = true; updateTimerUI(); clearInterval(timerInterval);
+    let pool = Math.random() < 0.5 ? citiesEasy : citiesHard; selectedCity = pool[Math.floor(Math.random()*pool.length)];
+    document.getElementById("cityName").innerText = selectedCity[0]; roundActive = true; updateTimerUI(); clearInterval(timerInterval);
     if(currentMode !== 'hardcore') { timerInterval = setInterval(() => { timeLeft--; updateTimerUI(); if(timeLeft<=0) gameOver("Süre Doldu!"); }, 1000); }
 }
 
-function updateTimerUI() {
-    let m = Math.floor(timeLeft/60), s = timeLeft%60;
-    document.getElementById("timer").innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-}
+function updateTimerUI() { let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById("timer").innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
 
-map.on('click', (e) => {
-    if(!roundActive) return;
-    if(guessMarker) map.removeLayer(guessMarker);
-    guessMarker = L.marker(e.latlng).addTo(map);
-    document.getElementById("guessBtn").classList.add("active");
-});
+map.on('click', (e) => { if(!roundActive) return; if(guessMarker) map.removeLayer(guessMarker); guessMarker = L.marker(e.latlng).addTo(map); document.getElementById("guessBtn").classList.add("active"); });
 
 function makeGuess() {
     if(!roundActive || !guessMarker) return;
@@ -573,83 +488,66 @@ function makeGuess() {
     document.getElementById("guessBtn").style.display = "none";
     let realPos = L.latLng(selectedCity[1], selectedCity[2]);
     let guessPos = guessMarker.getLatLng();
+    
+    playBinocularSound();
     map.flyTo(guessPos, 8, { duration: 1.5 });
+    
     setTimeout(() => {
+        playWindSound(1.5);
         map.panTo(realPos, { animate: true, duration: 1.2 });
+        
         setTimeout(() => {
             realMarker = L.marker(realPos).addTo(map);
             line = L.polyline([guessPos, realPos], {color: 'red', weight: 3}).addTo(map);
             let dist = Math.round(map.distance(guessPos, realPos) / 1000);
-            if(currentMode === 'hardcore' && dist > 500) {
-                gameOver(`Hata payını aştın! Mesafe: ${dist} km (Sınır 500 km)`);
-                return;
-            }
+            if(currentMode === 'hardcore' && dist > 500) { gameOver(`Hata payını aştın! Mesafe: ${dist} km`); return; }
             if(currentMode === 'speedrun' && dist <= 500) timeLeft = 60;
             let roundScore = Math.max(0, 5000 - (dist * 5));
             score += roundScore;
-            document.getElementById("score").innerText = score;
+    
             document.getElementById("distanceBox").innerText = `${dist} km | +${roundScore} Puan`;
             document.getElementById("distanceBox").style.display = "block";
-            if(score >= 25000) setTimeout(showFinalScreen, 1500); 
-            else startMola(); 
+            
+            // YENİ ANİMASYON TETİKLEMESİ
+            animateScoreWithOverlay(roundScore);
+
+            if(score >= 25000) setTimeout(showFinalScreen, 4000);
         }, 1300);
     }, 2000);
 }
 
 function startMola() {
-    let molaTime = 5; let molaBaseTime = timeLeft; 
-    document.getElementById("timer").innerText = "Mola: " + molaTime;
-    clearInterval(nextRoundInterval);
-    nextRoundInterval = setInterval(() => {
-        molaTime--; document.getElementById("timer").innerText = "Mola: " + molaTime;
-        if(molaTime <= 0) {
-            clearInterval(nextRoundInterval);
-            timeLeft = molaBaseTime;
-            const curtain = document.getElementById('transition-curtain');
-            curtain.classList.add('active');
-            setTimeout(() => {
-                map.setView([20,0], 3);
-                startRound();
-                setTimeout(() => { curtain.classList.remove('active'); }, 200);
-            }, 600);
-        }
+    let molaTime = 5; let mBase = timeLeft;
+    document.getElementById("timer").innerText = "Mola: " + molaTime; clearInterval(nextRoundInterval);
+    nextRoundInterval = setInterval(() => { 
+        molaTime--; 
+        document.getElementById("timer").innerText = "Mola: " + molaTime; 
+        if(molaTime >= 0) { playClockTick(molaTime % 2 === 0); }
+        if(molaTime <= 0) { 
+            clearInterval(nextRoundInterval); timeLeft = mBase; 
+            const curtain = document.getElementById('transition-curtain'); curtain.classList.add('active'); 
+            setTimeout(() => { 
+                map.setView([20,0], 3); startRound(); 
+                setTimeout(() => { curtain.classList.remove('active'); }, 200); 
+            }, 600); 
+        } 
     }, 1000);
 }
 
-function gameOver(msg) {
-    clearInterval(timerInterval); clearInterval(nextRoundInterval);
-    document.getElementById("result").style.display = "block";
-    document.getElementById("result").innerHTML = `<h2>OYUN BİTTİ</h2><p>${msg}</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#ffcc00; border:none; border-radius:10px; font-weight:bold; color:black; cursor:pointer;\">LOBİYE DÖN</button>`;
-}
+function gameOver(msg) { clearInterval(timerInterval); clearInterval(nextRoundInterval); document.getElementById("result").style.display = "block";
+document.getElementById("result").innerHTML = `<h2>OYUN BİTTİ</h2><p>${msg}</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#ffcc00; border:none; border-radius:10px; font-weight:bold; color:black; cursor:pointer;\">LOBİYE DÖN</button>`; }
 
-function showFinalScreen() {
-    const isChallenge = ['blind_shot', 'total_time'].includes(currentMode);
-    if(!isChallenge) { wins++; localStorage.setItem('weekWorldWins', wins); }
-    else { medals++; localStorage.setItem('weekWorldMedals', medals); }
-    document.getElementById("result").style.display = "block";
-    document.getElementById("result").innerHTML = `<h2 style="color:green">TEBRİKLER!</h2><p>25.000 Puan Barajını Geçtin!</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#2962ff; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;\">LOBİYE DÖN</button>`;
-}
+function showFinalScreen() { const isCh = ['blind_shot', 'total_time'].includes(currentMode); if(!isCh) { wins++; localStorage.setItem('weekWorldWins', wins); } else { medals++; localStorage.setItem('weekWorldMedals', medals); } document.getElementById("result").style.display = "block"; document.getElementById("result").innerHTML = `<h2 style="color:green">TEBRİKLER!</h2><p>25.000 Puan Barajını Geçtin!</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#2962ff; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;\">LOBİYE DÖN</button>`; }
 
-/* --- 3D DÜNYA VE DİĞERLERİ --- */
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(380, 380); document.getElementById('world-3d-container').appendChild(renderer.domElement);
-const globe = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') }));
-scene.add(globe);
-const light = new THREE.DirectionalLight(0xffffff, 1.3); light.position.set(5,3,5); scene.add(light);
-scene.add(new THREE.AmbientLight(0x666666)); camera.position.z = 5.5;
-let isDragging = false, prevMouse = {x:0, y:0};
-document.getElementById('world-3d-container').onmousedown = () => isDragging = true;
-window.onmouseup = () => isDragging = false;
-window.onmousemove = (e) => { if(isDragging) { globe.rotation.y += (e.clientX - prevMouse.x)*0.01; globe.rotation.x += (e.clientY - prevMouse.y)*0.01; } prevMouse = {x:e.clientX, y:e.clientY}; };
-function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
-animate(); updateUI();
-setInterval(() => {
-    totalSeconds++; localStorage.setItem('weekWorldPlaytime', totalSeconds);
-    let d = Math.floor(totalSeconds / 86400), h = Math.floor((totalSeconds % 86400) / 3600), m = Math.floor((totalSeconds % 3600) / 60);
-    if(document.getElementById('playtime-display')) document.getElementById('playtime-display').innerText = `${d} Gün ${h} Saat ${m} Dakika`;
-}, 1000);
+/* --- 3D DÜNYA --- */
+const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); renderer.setSize(380, 380); document.getElementById('world-3d-container').appendChild(renderer.domElement);
+const globe = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') })); scene.add(globe);
+const light = new THREE.DirectionalLight(0xffffff, 1.3); light.position.set(5,3,5); scene.add(light); scene.add(new THREE.AmbientLight(0x666666)); camera.position.z = 5.5;
+let isDrg = false, prevM = {x:0, y:0}; document.getElementById('world-3d-container').onmousedown = () => isDrg = true;
+window.onmouseup = () => isDrg = false; window.onmousemove = (e) => { if(isDrg) { globe.rotation.y += (e.clientX - prevM.x)*0.01; globe.rotation.x += (e.clientY - prevM.y)*0.01; } prevM = {x:e.clientX, y:e.clientY}; };
+function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); } animate(); updateUI();
+setInterval(() => { totalSeconds++; localStorage.setItem('weekWorldPlaytime', totalSeconds); let d = Math.floor(totalSeconds / 86400), h = Math.floor((totalSeconds % 86400) / 3600), m = Math.floor((totalSeconds % 3600) / 60); if(document.getElementById('playtime-display')) document.getElementById('playtime-display').innerText = `${d} Gün ${h} Saat ${m} Dakika`; }, 1000);
 </script>
 </body>
 </html>
