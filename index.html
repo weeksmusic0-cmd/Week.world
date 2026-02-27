@@ -10,138 +10,208 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
-    body{margin:0;font-family:'Segoe UI',Arial;overflow:hidden; background: #000; color: white;}
-    #map{height:100vh; width:100%; cursor:crosshair; background: #222; position: absolute; top:0; left:0; z-index: 1;}
+    body{margin:0;font-family:'Segoe UI',Arial;overflow:hidden;
+    background: #000; color: white;}
+    #map{height:100vh; width:100%; cursor:crosshair; background: #222; position: absolute; top:0; left:0;
+    z-index: 1;}
 
     /* SES KONTROL BUTONU */
     #music-toggle {
-        position: fixed; top: 20px; left: 20px; z-index: 30005;
+        position: fixed;
+        top: 20px; left: 20px; z-index: 30005;
         background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white;
         padding: 10px; border-radius: 50%; width: 50px; height: 50px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s; user-select: none;
+        font-size: 24px; cursor: pointer; backdrop-filter: blur(5px);
+        transition: 0.3s; user-select: none;
     }
-    #music-toggle:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+    #music-toggle:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1);
+    }
 
     /* GEÇİŞ PERDESİ */
     #transition-curtain {
-        position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%;
-        background: #000; z-index: 30000; transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none;
+        position: fixed;
+        bottom: -100%; left: 0; width: 100%; height: 100%;
+        background: #000; z-index: 30000; transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
     }
-    #transition-curtain.active { bottom: 0; }
+    #transition-curtain.active { bottom: 0;
+    }
 
     /* MENÜ VE EKRANLAR */
     #main-menu, #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #050505; z-index: 9999;
-        display: flex; justify-content: space-between; align-items: center; transition: opacity 0.5s ease;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100vh; background: #050505; z-index: 9999;
+        display: flex; justify-content: space-between; align-items: center;
+        transition: opacity 0.5s ease;
     }
-    #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu { display: none; flex-direction: column; justify-content: center; z-index: 10001; }
+    #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu { display: none; flex-direction: column; justify-content: center;
+    z-index: 10001; }
 
     /* GEÇİŞ EKRANI */
     #start-countdown-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
         background: radial-gradient(circle, #1a1a1a 0%, #000 100%); z-index: 20000;
-        display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        display: none; flex-direction: column;
+        align-items: center; justify-content: center; text-align: center;
     }
-    .slide-up-out { animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    @keyframes slideUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
-    .countdown-number { font-size: 12rem; font-weight: 900; color: white; animation: pulseNumber 1s infinite; }
-    @keyframes pulseNumber { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+    .slide-up-out { animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes slideUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100%); opacity: 0;
+    } }
+    .countdown-number { font-size: 12rem; font-weight: 900; color: white; animation: pulseNumber 1s infinite;
+    }
+    @keyframes pulseNumber { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1);
+    opacity: 1; } }
 
     /* PUAN ANİMASYON KATMANI */
     #score-animation-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
         z-index: 50000; display: none; align-items: center; justify-content: center; pointer-events: none;
     }
-    .score-anim-container { position: relative; display: flex; align-items: center; justify-content: center; }
-    .big-score-text { font-size: 10rem; font-weight: 900; color: #ffcc00; transform: scale(0); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .score-anim-container { position: relative; display: flex; align-items: center; justify-content: center;
+    }
+    .big-score-text { font-size: 10rem; font-weight: 900; color: #ffcc00; transform: scale(0);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .added-score-text {
-        position: absolute; top: -60px; left: -40px; font-size: 4rem; font-weight: 900; color: #ffcc00;
+        position: absolute;
+        top: -60px; left: -40px; font-size: 4rem; font-weight: 900; color: #ffcc00;
         opacity: 0; transform: translateY(20px); transition: 0.5s ease-out;
     }
     .big-score-text.active { transform: scale(1); }
-    .added-score-text.active { opacity: 1; transform: translateY(0); }
+    .added-score-text.active { opacity: 1; transform: translateY(0);
+    }
 
     /* MARKET VE DİĞER MENÜLER */
-    .market-header { position: absolute; top: 30px; right: 50px; display: flex; align-items: center; gap: 15px; font-size: 24px; font-weight: bold; color: #ffcc00; }
-    .market-container { width: 90%; max-height: 85vh; overflow-y: auto; padding: 20px; text-align: center; }
-    .market-section-title { font-size: 1.8rem; color: #ffcc00; margin: 40px 0 20px 0; border-bottom: 2px solid #333; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-    .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; margin-bottom: 50px; }
-    .market-item { background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 20px; padding: 20px; transition: 0.3s; }
-    .item-img-preview { width: 80px; height: 80px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #444; object-fit: cover; }
-    .frame-preview { border-radius: 50%; border: 4px solid; position: relative; overflow: hidden; }
-    .item-name { font-weight: bold; margin-bottom: 5px; font-size: 14px; height: 40px; display: flex; align-items: center; justify-content: center; }
-    .item-price { color: #ffcc00; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-    .buy-btn { background: #2962ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
-    .buy-btn:hover { background: #0039cb; }
-    .buy-btn.owned { background: #444; cursor: default; }
+    .market-header { position: absolute; top: 30px;
+    right: 50px; display: flex; align-items: center; gap: 15px; font-size: 24px; font-weight: bold; color: #ffcc00;
+    }
+    .market-container { width: 90%; max-height: 85vh; overflow-y: auto; padding: 20px; text-align: center;
+    }
+    .market-section-title { font-size: 1.8rem; color: #ffcc00; margin: 40px 0 20px 0; border-bottom: 2px solid #333;
+    padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+    .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px;
+    margin-bottom: 50px; }
+    .market-item { background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 20px; padding: 20px; transition: 0.3s;
+    }
+    .item-img-preview { width: 80px; height: 80px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #444; object-fit: cover;
+    }
+    .frame-preview { border-radius: 50%; border: 4px solid; position: relative; overflow: hidden;
+    }
+    .item-name { font-weight: bold; margin-bottom: 5px; font-size: 14px; height: 40px; display: flex; align-items: center; justify-content: center;
+    }
+    .item-price { color: #ffcc00; font-size: 18px; font-weight: bold; margin-bottom: 15px;
+    }
+    .buy-btn { background: #2962ff; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;
+    font-weight: bold; width: 100%; transition: 0.2s; }
+    .buy-btn:hover { background: #0039cb;
+    }
+    .buy-btn.owned { background: #444; cursor: default;
+    }
 
     /* LOBİ */
-    .center-stage { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; z-index: 10000; }
-    .game-title { color: white; font-size: 4.5rem; margin: 0 0 10px 0; letter-spacing: -2px; pointer-events: none; }
-    #world-3d-container { width: 380px; height: 380px; cursor: grab; }
-    .disclaimer-text { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); margin-top: 20px; max-width: 300px; text-align: center; line-height: 1.4; font-style: italic; pointer-events: none; user-select: none; }
+    .center-stage { position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; z-index: 10000; }
+    .game-title { color: white;
+    font-size: 4.5rem; margin: 0 0 10px 0; letter-spacing: -2px; pointer-events: none; }
+    #world-3d-container { width: 380px;
+    height: 380px; cursor: grab; }
+    .disclaimer-text { font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); margin-top: 20px;
+    max-width: 300px; text-align: center; line-height: 1.4; font-style: italic; pointer-events: none; user-select: none; }
 
-    .side-menu-left { display: flex; flex-direction: column; gap: 20px; margin-left: 50px; z-index: 10000; }
-    .mode-card { width: 260px; height: 110px; background: rgba(255, 255, 255, 0.03); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.4s; position: relative; overflow: hidden; }
-    .mode-card:hover { border-color: #ffcc00; transform: translateY(-5px); background: rgba(255, 255, 255, 0.08); }
-    .mode-title { font-size: 1.1rem; font-weight: bold; text-align: center; transition: 0.3s; }
-    .mode-desc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 85%; font-size: 0.85rem; color: #ffcc00; opacity: 0; transition: 0.3s; pointer-events: none; }
-    .mode-card:hover .mode-title { opacity: 0; }
+    .side-menu-left { display: flex;
+    flex-direction: column; gap: 20px; margin-left: 50px; z-index: 10000; }
+    .mode-card { width: 260px; height: 110px;
+    background: rgba(255, 255, 255, 0.03); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 15px; cursor: pointer; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; transition: 0.4s; position: relative; overflow: hidden; }
+    .mode-card:hover { border-color: #ffcc00; transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08); }
+    .mode-title { font-size: 1.1rem; font-weight: bold; text-align: center; transition: 0.3s;
+    }
+    .mode-desc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 85%;
+    font-size: 0.85rem; color: #ffcc00; opacity: 0; transition: 0.3s; pointer-events: none; }
+    .mode-card:hover .mode-title { opacity: 0;
+    }
     .mode-card:hover .mode-desc { opacity: 1; }
     
-    .achv-card { cursor: default; transition: 0.4s; }
-    .achv-card:hover { border-color: #9c27b0; transform: translateY(-5px); background: rgba(156, 39, 176, 0.1); }
-    .achv-title { font-size: 1.4rem; font-weight: 900; color: white; transition: 0.3s; }
+    .achv-card { cursor: default;
+    transition: 0.4s; }
+    .achv-card:hover { border-color: #9c27b0; transform: translateY(-5px); background: rgba(156, 39, 176, 0.1);
+    }
+    .achv-title { font-size: 1.4rem; font-weight: 900; color: white; transition: 0.3s;
+    }
     .achv-card:hover .achv-title { opacity: 0; }
-    .achv-card:hover .mode-desc { opacity: 1; }
+    .achv-card:hover .mode-desc { opacity: 1;
+    }
 
-    .side-menu-right { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 10000; }
-    .panel-box { background: rgba(20, 25, 35, 0.9); padding: 15px 20px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); width: 260px; }
+    .side-menu-right { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 10000;
+    }
+    .panel-box { background: rgba(20, 25, 35, 0.9); padding: 15px 20px; border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1); width: 260px; }
     
-    .mini-profile { cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
-    .avatar-wrapper { width: 64px; height: 64px; position: relative; display: flex; align-items: center; justify-content: center; }
-    .avatar-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: #333; z-index: 1; }
-    .avatar-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; z-index: 2; box-sizing: border-box; }
+    .mini-profile { cursor: pointer;
+    transition: 0.3s; position: relative; overflow: hidden; }
+    .avatar-wrapper { width: 64px; height: 64px; position: relative; display: flex;
+    align-items: center; justify-content: center; }
+    .avatar-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: #333;
+    z-index: 1; }
+    .avatar-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+    pointer-events: none; z-index: 2; box-sizing: border-box; }
 
-    .inventory-section { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 15px; margin-bottom: 20px; text-align: left; border: 1px solid #333; }
-    .inventory-title { color: #888; font-size: 12px; margin-bottom: 10px; font-weight: bold; text-transform: uppercase;}
-    .inventory-grid { display: flex; gap: 15px; flex-wrap: wrap; }
-    .title-tag { background: #222; border: 1px solid #444; color: #eee; padding: 8px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
-    .title-tag.active { background: #ffcc00; color: #000; font-weight: bold; border-color: #ffcc00; }
+    .inventory-section { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 15px; margin-bottom: 20px;
+    text-align: left; border: 1px solid #333; }
+    .inventory-title { color: #888; font-size: 12px; margin-bottom: 10px; font-weight: bold;
+    text-transform: uppercase;}
+    .inventory-grid { display: flex; gap: 15px; flex-wrap: wrap;
+    }
+    .title-tag { background: #222; border: 1px solid #444; color: #eee; padding: 8px 15px; border-radius: 8px;
+    font-size: 12px; cursor: pointer; transition: 0.2s; }
+    .title-tag.active { background: #ffcc00; color: #000; font-weight: bold; border-color: #ffcc00;
+    }
 
     /* MOR VE SARI TASARIM */
-    .top-bar{ position:absolute;top:20px;left:0;width:100%; display:flex;justify-content:space-between;padding:0 30px;box-sizing:border-box;z-index:1000; visibility: hidden; pointer-events: none;}
+    .top-bar{ position:absolute;top:20px;left:0;width:100%; display:flex;justify-content:space-between;padding:0 30px;box-sizing:border-box;z-index:1000; visibility: hidden;
+    pointer-events: none;}
     .city-box{
         background: #6a1b9a; padding:12px 25px; border-radius:12px; 
-        color:#ffcc00; font-size: 20px; pointer-events: auto;
+        color:#ffcc00;
+        font-size: 20px; pointer-events: auto;
         font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: lowercase;
     }
     .score-box{
         background: #6a1b9a; color:#ffcc00; padding:12px 25px; border-radius:12px; 
-        min-width:140px; text-align:center; pointer-events: auto;
+        min-width:140px; text-align:center;
+        pointer-events: auto;
         font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: lowercase;
     }
     .timer-box{ 
-        position:absolute; top:20px; left:50%; transform:translateX(-50%); 
+        position:absolute;
+        top:20px; left:50%; transform:translateX(-50%); 
         background: #6a1b9a; color:#ffcc00; padding:12px 30px; border-radius:20px; 
         font-size: 22px; z-index:1000; visibility: hidden;
         font-family: 'Arial Black', 'Gadget', sans-serif;
     }
     .distance-box{ position:absolute;top:85px;left:50%;transform:translateX(-50%); background:#2962ff;color:white;padding:10px 25px;border-radius:20px; font-weight:bold;z-index:1000;display:none; }
-    .bottom-bar{ position:absolute;bottom:40px;left:50%;transform:translateX(-50%); z-index:1000; visibility: hidden;}
+    .bottom-bar{ position:absolute;bottom:40px;left:50%;transform:translateX(-50%); z-index:1000;
+    visibility: hidden;}
     .guess-btn { 
-        padding:16px 60px; font-size:20px; border-radius:40px; 
+        padding:16px 60px; font-size:20px; border-radius:40px;
         background: #6a1b9a; color:#ffcc00; cursor:pointer; border:none; 
         opacity: 0.4; pointer-events: none; transition: 0.3s; 
         font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: lowercase;
     }
     .guess-btn.active { opacity: 1; pointer-events: auto; }
 
-    .result-box{ position:fixed;top:50%;left:50%;transform:translate(-50%,-50%); background:white;padding:40px;border-radius:24px; z-index:10001; display:none; text-align:center; color: black; }
-    .back-btn { padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border-radius: 10px; cursor: pointer; border: 1px solid #444; font-weight: bold;}
-    .win-bar { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; display: flex; gap: 2px; padding: 2px; }
-    .tick { flex: 1; background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .result-box{ position:fixed;top:50%;left:50%;transform:translate(-50%,-50%); background:white;padding:40px;border-radius:24px; z-index:10001; display:none; text-align:center;
+    color: black; }
+    .back-btn { padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border-radius: 10px; cursor: pointer;
+    border: 1px solid #444; font-weight: bold;}
+    .win-bar { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; display: flex;
+    gap: 2px; padding: 2px; }
+    .tick { flex: 1; background: rgba(255,255,255,0.1); border-radius: 2px;
+    }
     .tick.active { background: #ffcc00; }
 
     /* BAŞARIM BİLDİRİM EKRANI */
@@ -160,15 +230,20 @@
         z-index: 99999;
         transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .achv-notif-text-container { display: flex; flex-direction: column; position: relative; }
+    .achv-notif-text-container { display: flex; flex-direction: column; position: relative;
+    }
     #achv-medal-badge {
-        position: absolute; top: -10px; right: -20px; background: #ffcc00; color: black;
+        position: absolute; top: -10px; right: -20px;
+        background: #ffcc00; color: black;
         font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 10px; display: none;
     }
 
     /* ÖZEL ÇERÇEVELER */
-    .fire-frame { border: 4px solid transparent !important; background-image: linear-gradient(#000, #000), linear-gradient(to right, orange, red, yellow); background-origin: border-box; background-clip: content-box, border-box; animation: rotateGradient 2s linear infinite; }
-    @keyframes rotateGradient { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+    .fire-frame { border: 4px solid transparent !important;
+    background-image: linear-gradient(#000, #000), linear-gradient(to right, orange, red, yellow); background-origin: border-box; background-clip: content-box, border-box; animation: rotateGradient 2s linear infinite;
+    }
+    @keyframes rotateGradient { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg);
+    } }
 </style>
 </head>
 <body onclick="initFirstAudio()">
@@ -193,7 +268,9 @@
     <div class="achv-notif-text-container">
         <div id="achv-medal-badge">+1 🏆</div>
         <span style="font-size: 13px; font-weight: bold; color: #e1bee7; margin-bottom: 3px;">BAŞARIM KAZANILDI</span>
-        <span id="achv-notif-title" style="font-size: 18px; font-weight: 900; opacity: 0; transition: opacity 1s ease-in;">Şampiyon</span>
+     
+        <span id="achv-notif-title" style="font-size: 18px; font-weight: 900; opacity: 0;
+        transition: opacity 1s ease-in;">Şampiyon</span>
     </div>
 </div>
 
@@ -205,7 +282,8 @@
         <div class="mode-card" onclick="openChallenges()"><span class="mode-title">📚 MEYDAN OKUMALAR</span><span class="mode-desc">Özel ödüller ve madalyalar kazan.</span></div>
     </div>
     
-    <div class="center-stage">
+    <div 
+    class="center-stage">
         <h1 class="game-title">Week.world</h1>
         <div id="world-3d-container"></div>
         <div class="disclaimer-text">Oyunumuz tamamıyla eğlence amaçlıdır herhangi bir para kazanma gibi bir amacımız yoktur!</div>
@@ -213,26 +291,36 @@
     
     <div class="side-menu-right">
         <div class="panel-box mini-profile" onclick="openProfileEdit()">
-            <div style="display:flex; align-items:center; gap:15px;">
+            <div style="display:flex;
+            align-items:center; gap:15px;">
                 <div class="avatar-wrapper"><img src="" id="display-avatar" class="avatar-img"><div id="display-frame" class="avatar-frame"></div></div>
-                <div><div id="display-name" style="font-weight:bold;">Oyuncu</div><div id="display-title" style="font-size:10px; color:#ffcc00;">YENİ OYUNCU</div></div>
+                <div><div id="display-name" style="font-weight:bold;">Oyuncu</div><div id="display-title" style="font-size:10px;
+                color:#ffcc00;">YENİ OYUNCU</div></div>
             </div>
         </div>
-        <div class="panel-box"><div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;"><span id="rank-emoji" style="font-size:36px;">⛓️</span><div><div style="font-size: 10px; color: #888;">RANK</div><div id="rank-name" style="font-weight:bold;">Demir</div></div></div><div class="win-bar" id="win-ticks"></div></div>
-        <div class="panel-box"><div style="font-size: 10px; color: #888;">TOPLAM OYNAMA SÜRESİ</div><div id="playtime-display" style="font-size: 14px; font-weight: bold; color: #ffcc00; margin-top: 5px;">0 Gün 0 Saat 0 Dakika</div></div>
-        <button class="buy-btn" style="height:50px; font-size:16px; background: linear-gradient(45deg, #6200ea, #2962ff);" onclick="openMarket()">🛒 MARKET</button>
+        <div class="panel-box"><div style="display:flex;
+        align-items:center; gap:10px; margin-bottom:12px;"><span id="rank-emoji" style="font-size:36px;">⛓️</span><div><div style="font-size: 10px; color: #888;">RANK</div><div id="rank-name" style="font-weight:bold;">Demir</div></div></div><div class="win-bar" id="win-ticks"></div></div>
+        <div class="panel-box"><div style="font-size: 10px;
+        color: #888;">TOPLAM OYNAMA SÜRESİ</div><div id="playtime-display" style="font-size: 14px; font-weight: bold; color: #ffcc00;
+        margin-top: 5px;">0 Gün 0 Saat 0 Dakika</div></div>
+        <button class="buy-btn" style="height:50px; font-size:16px;
+        background: linear-gradient(45deg, #6200ea, #2962ff);" onclick="openMarket()">🛒 MARKET</button>
     </div>
 
-    <div class="mode-card" style="position: absolute; bottom: 30px; right: 30px; z-index: 10000; width: 260px;" onclick="openAchievements()">
+    <div class="mode-card" style="position: absolute; bottom: 30px;
+    right: 30px; z-index: 10000; width: 260px;" onclick="openAchievements()">
         <span class="mode-title">🏅 BAŞARIMLAR</span>
         <span class="mode-desc">Başarımları Görüntüle</span>
     </div>
 </div>
 
 <div id="achievement-menu">
-    <h2 id="achv-header" style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-bottom: 40px; margin-top: 50px;">Sahip olunan başarımlar: 0</h2>
-    <div id="achv-grid" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 900px; padding: 20px; overflow-y: auto;"></div>
-    <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeAchievements()">← GERİ DÖN</button>
+    <h2 id="achv-header" style="font-size: 3rem;
+    font-weight: 900; color: #ffcc00; margin-bottom: 40px; margin-top: 50px;">Sahip olunan başarımlar: 0</h2>
+    <div id="achv-grid" style="display: flex; flex-wrap: wrap;
+    gap: 20px; justify-content: center; max-width: 900px; padding: 20px; overflow-y: auto;"></div>
+    <button class="back-btn" style="position: absolute; bottom: 40px;
+    left: 40px;" onclick="closeAchievements()">← GERİ DÖN</button>
 </div>
 
 <div id="market-menu">
@@ -245,26 +333,36 @@
         <h2 class="market-section-title">🎖️ Ünvanlar</h2>
         <div class="market-grid" id="market-grid-titles"></div>
     </div>
-    <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeMarket()">← GERİ DÖN</button>
+    <button class="back-btn" style="position: absolute;
+    bottom: 40px; left: 40px;" onclick="closeMarket()">← GERİ DÖN</button>
 </div>
 
 <div id="challenge-menu">
     <h2 style="font-size: 3rem;">Meydan Okumalar</h2>
-    <div style="display:flex; gap:20px; margin-top: 20px;">
+    <div style="display:flex;
+    gap:20px; margin-top: 20px;">
         <div class="mode-card" onclick="startCountdown('total_time')"><span class="mode-title">⏳ TOPLAM SÜRE</span><span class="mode-desc">25.000 puan için toplam 2 dakikan var!</span></div>
         <div class="mode-card" onclick="startCountdown('blind_shot')"><span class="mode-title">🌑 KÖR ATIŞ</span><span class="mode-desc">Sınırsız harita, 500km sınır ve 3 dk!</span></div>
     </div>
-    <div class="panel-box" style="margin-top:40px; width: auto; padding: 15px 40px; text-align: center;">🏆 MADALYALAR: <span id="challenge-medal-count" style="font-weight:bold; color:#ffcc00; font-size: 24px;">0</span></div>
-    <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeChallenges()">← GERİ</button>
+    <div class="panel-box" style="margin-top:40px;
+    width: auto; padding: 15px 40px; text-align: center;">🏆 MADALYALAR: <span id="challenge-medal-count" style="font-weight:bold; color:#ffcc00;
+    font-size: 24px;">0</span></div>
+    <button class="back-btn" style="position: absolute; bottom: 40px;
+    left: 40px;" onclick="closeChallenges()">← GERİ</button>
 </div>
 
-<div id="profile-edit-menu" style="background: rgba(15, 15, 20, 0.95); border: 1px solid #333; width: 700px; padding: 40px; border-radius: 20px; text-align: center; margin: auto; max-height: 80vh; overflow-y: auto;">
-    <h2 style="margin-top: 0; color: #ffcc00;">Profil ve Envanter</h2>
-    <div style="margin-bottom: 30px;"><div class="inventory-title">KULLANICI ADI</div><input type="text" id="name-input" placeholder="İsim Değiştir" style="padding:15px; border-radius:10px; border: 1px solid #444; background: rgba(0,0,0,0.5); color: white; width:80%; font-size: 16px; text-align: center;"></div>
+<div id="profile-edit-menu" style="background: rgba(15, 15, 20, 0.95); border: 1px solid #333; width: 700px; padding: 40px; border-radius: 20px;
+    text-align: center; margin: auto; max-height: 80vh; overflow-y: auto;">
+    <h2 style="margin-top: 0;
+    color: #ffcc00;">Profil ve Envanter</h2>
+    <div style="margin-bottom: 30px;"><div class="inventory-title">KULLANICI ADI</div><input type="text" id="name-input" placeholder="İsim Değiştir" style="padding:15px; border-radius:10px;
+    border: 1px solid #444; background: rgba(0,0,0,0.5); color: white; width:80%; font-size: 16px;
+    text-align: center;"></div>
     <div class="inventory-section"><div class="inventory-title">SAHİP OLUNAN ÜNVANLAR</div><div class="inventory-grid" id="inv-titles" style="justify-content: center;"></div></div>
     <div class="inventory-section"><div class="inventory-title">SAHİP OLUNAN AVATARLAR</div><div class="inventory-grid" id="inv-avatars"></div></div>
     <div class="inventory-section"><div class="inventory-title">SAHİP OLUNAN ÇERÇEVELER</div><div class="inventory-grid" id="inv-frames"></div></div>
-    <button class="back-btn" style="margin-top: 20px; width: 200px; background: #2962ff; border: none;" onclick="closeProfileEdit()">KAYDET VE ÇIK</button>
+    <button class="back-btn" style="margin-top: 20px;
+    width: 200px; background: #2962ff; border: none;" onclick="closeProfileEdit()">KAYDET VE ÇIK</button>
 </div>
 
 <div class="top-bar" id="game-top-bar">
@@ -288,6 +386,9 @@ let profileData = JSON.parse(localStorage.getItem('weekWorldProfile')) || { name
 
 /* --- BAŞARIMLAR VERİ TABANI --- */
 let unlockedAchievements = JSON.parse(localStorage.getItem('weekWorldAchievements')) || [];
+let spentMedals = parseInt(localStorage.getItem('weekWorldSpentMedals')) || 0;
+let streak4500 = parseInt(localStorage.getItem('weekWorldStreak4500')) || 0;
+
 const achievementsData = [
     { id: 'guess_5k', title: '5.000 Puan', desc: 'Harita üzerinde 5.000 puanlık tahmin yap', emoji: '🎯', reward: 3 },
     { id: 'atlas_50', title: 'Atlas Uzmanı', desc: 'Oyun üzerinde 50 galibiyete ulaş!', emoji: '🗺️', reward: 10 },
@@ -297,7 +398,10 @@ const achievementsData = [
     { id: 'first_right', title: 'İlk Doğru', desc: 'İlk doğru tahminin yaptım.', emoji: '✅', reward: 1 },
     { id: 'blind_20k', title: 'Zifiri Karanlık', desc: 'Kör Atış modunda 20.000 puan barajını aş!', emoji: '🌑', reward: 5 },
     { id: 'hard_win', title: 'Çelik Sinirler', desc: 'Zor Modda (Hardcore) galibiyet al.', emoji: '🧭', reward: 5 },
-    { id: 'loyal_10h', title: 'Sadık Oyuncu', desc: 'Toplam 10 saat oynama süresine ulaş.', emoji: '⏳', reward: 5 }
+    { id: 'loyal_10h', title: 'Sadık Oyuncu', desc: 'Toplam 10 saat oynama süresine ulaş.', emoji: '⏳', reward: 5 },
+    { id: 'rich', title: 'Zengin', desc: 'Markette 50 madalya harca.', emoji: '💰', reward: 8 },
+    { id: 'unstoppable', title: 'Durmak Yok!', desc: 'Üst üste 3 şehir tahmininden en az 4500 puan al.', emoji: '🔥', reward: 8 },
+    { id: 'penguin', title: 'Penguenmi Görüyorum?', desc: 'Antartika kıtasında rastgele bir konumu işaretle.', emoji: '🐧', reward: 0 }
 ];
 
 /* --- SES MOTORU --- */
@@ -330,7 +434,8 @@ function toggleGlobalMusic(event) {
 }
 
 function stopMusic() { 
-    if (musicLoopInterval) { clearInterval(musicLoopInterval); musicLoopInterval = null; } 
+    if (musicLoopInterval) { clearInterval(musicLoopInterval); musicLoopInterval = null;
+    } 
     currentMusicType = null;
 }
 
@@ -347,7 +452,8 @@ function startLobbyMusic() {
         const g = audioCtx.createGain(); 
         osc.frequency.setValueAtTime(chords[Math.floor(step / 4) % 4], now); 
         g.gain.setValueAtTime(0, now); 
-        g.gain.linearRampToValueAtTime(0.05, now + 1); 
+        g.gain.linearRampToValueAtTime(0.05, 
+        now + 1); 
         g.gain.linearRampToValueAtTime(0, now + 3); 
         osc.connect(g); 
         g.connect(masterGain); 
@@ -387,7 +493,8 @@ function playBinocularSound() {
     const g = audioCtx.createGain();
     osc.type = 'square'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
     g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(now + 0.15);
+    osc.connect(g);
+    g.connect(audioCtx.destination); osc.start(); osc.stop(now + 0.15);
 }
 
 function playWindSound(duration) {
@@ -395,30 +502,36 @@ function playWindSound(duration) {
     const bufferSize = audioCtx.sampleRate * duration;
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+    for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1;
+    }
     const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
     const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(400, audioCtx.currentTime);
     filter.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + duration/2);
     const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.2); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-    noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start();
+    noise.connect(filter); filter.connect(gain);
+    gain.connect(audioCtx.destination); noise.start();
 }
 
 function playClockTick(isTak = false) {
     if (isMusicMuted || !audioCtx) return;
-    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
     osc.type = 'sine'; osc.frequency.setValueAtTime(isTak ? 200 : 400, audioCtx.currentTime);
     gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
 function playScoreTick() {
     if (isMusicMuted || !audioCtx) return;
-    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
     osc.type = 'sine'; osc.frequency.setValueAtTime(600 + (Math.random()*400), audioCtx.currentTime);
     gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
 }
 
 /* --- PUAN ANİMASYONU --- */
@@ -434,7 +547,6 @@ function animateScoreWithOverlay(roundScore) {
     mainScoreTxt.innerText = oldTotal;
     addedScoreTxt.innerText = "+" + roundScore;
     overlay.style.display = 'flex';
-    
     setTimeout(() => {
         mainScoreTxt.classList.add('active');
         setTimeout(() => {
@@ -443,18 +555,22 @@ function animateScoreWithOverlay(roundScore) {
             const steps = 30;
             const inc = roundScore / steps;
             let step = 0;
+      
             const int = setInterval(() => {
                 step++;
                 current = Math.floor(oldTotal + (inc * step));
                 if(step >= steps) {
                     current = targetTotal;
+          
                     clearInterval(int);
                     setTimeout(() => {
                         addedScoreTxt.classList.remove('active');
                         setTimeout(() => {
+                  
                             mainScoreTxt.classList.remove('active');
                             setTimeout(() => {
                                 overlay.style.display = 'none';
+                          
                                 startMola();
                             }, 500);
                         }, 1500);
@@ -470,7 +586,8 @@ function animateScoreWithOverlay(roundScore) {
 
 /* --- BAŞARIM FONKSİYONLARI --- */
 function openAchievements() { document.getElementById('achievement-menu').style.display = 'flex'; renderAchievements(); }
-function closeAchievements() { document.getElementById('achievement-menu').style.display = 'none'; }
+function closeAchievements() { document.getElementById('achievement-menu').style.display = 'none';
+}
 function renderAchievements() {
     document.getElementById('achv-header').innerText = `Sahip olunan başarımlar: ${unlockedAchievements.length}`;
     const grid = document.getElementById('achv-grid'); grid.innerHTML = '';
@@ -484,9 +601,11 @@ function renderAchievements() {
 
 let notifQueue = [];
 let isNotifPlaying = false;
-function showAchvNotification(achv) { notifQueue.push(achv); if (!isNotifPlaying) playNextNotif(); }
+function showAchvNotification(achv) { notifQueue.push(achv); if (!isNotifPlaying) playNextNotif();
+}
 function playNextNotif() {
-    if (notifQueue.length === 0) { isNotifPlaying = false; return; }
+    if (notifQueue.length === 0) { isNotifPlaying = false; return;
+    }
     isNotifPlaying = true;
     let achv = notifQueue.shift();
     let notifEl = document.getElementById('achv-notification');
@@ -496,7 +615,6 @@ function playNextNotif() {
     document.getElementById('achv-notif-emoji').innerText = achv.emoji;
     titleEl.innerText = achv.title;
     titleEl.style.opacity = "0";
-    
     // Madalya ödülü varsa göster
     if(achv.reward && achv.reward > 0) {
         medalBadge.innerText = `+${achv.reward} 🏆`;
@@ -556,7 +674,6 @@ const coloredProducts = [
     { id: 't_rich', type: 'title', name: 'Zengin Oyuncu', price: 15, titleColor: '#ccff00' },
     { id: 't_first', type: 'title', name: 'Birinci', price: 8, titleColor: '#00ffff' }
 ];
-
 function initMarket() {
     const grids = { photo: document.getElementById('market-grid-photos'), frame: document.getElementById('market-grid-frames'), title: document.getElementById('market-grid-titles') };
     Object.values(grids).forEach(g => g.innerHTML = '');
@@ -565,46 +682,68 @@ function initMarket() {
         const div = document.createElement('div'); div.className = 'market-item'; let preview = "";
         if(p.type === 'frame') preview = `<div class="item-img-preview frame-preview ${p.color === 'fire_gradient' ? 'fire-frame' : ''}" style="${p.color !== 'fire_gradient' ? 'border-color:'+p.color : ''}; margin:auto;"></div>`;
         else if(p.type === 'photo') preview = `<img src="${p.url}" class="item-img-preview" style="margin:auto;">`;
+     
         else preview = `<div style="color:${p.titleColor}; font-weight:bold; height:80px; display:flex; align-items:center; justify-content:center;">${p.name}</div>`;
-        div.innerHTML = `${preview}<div class="item-name">${p.type === 'title' ? '' : p.name}</div><div class="item-price">🏆 ${p.price}</div><button class="buy-btn ${isOwned ? 'owned' : ''}" onclick="buyProduct('${p.id}')">${isOwned ? 'SAHİPSİN' : 'SATIN AL'}</button>`;
+        div.innerHTML = `${preview}<div class="item-name">${p.type === 'title' ? '' : p.name}</div><div class="item-price">🏆 ${p.price}</div><button class="buy-btn ${isOwned ?
+        'owned' : ''}" onclick="buyProduct('${p.id}')">${isOwned ? 'SAHİPSİN' : 'SATIN AL'}</button>`;
         grids[p.type].appendChild(div);
     });
 }
 
 function buyProduct(id) {
     const p = coloredProducts.find(x => x.id === id); if(!p || medals < p.price) return;
-    medals -= p.price; if(p.type === 'photo') profileData.ownedAvatars.push(p.url); else if(p.type === 'frame') profileData.ownedFrames.push(p.color); else profileData.ownedTitles.push(p.name);
+    medals -= p.price; 
+    
+    // Başarım Kontrolü: Zengin
+    spentMedals += p.price;
+    localStorage.setItem('weekWorldSpentMedals', spentMedals);
+    if (spentMedals >= 50) unlockAchievement('rich');
+    
+    if(p.type === 'photo') profileData.ownedAvatars.push(p.url); else if(p.type === 'frame') profileData.ownedFrames.push(p.color); else profileData.ownedTitles.push(p.name);
     localStorage.setItem('weekWorldMedals', medals); saveProfile(); updateUI(); renderInventory(); initMarket();
 }
 
 function renderInventory() {
     const grids = { av: document.getElementById('inv-avatars'), fr: document.getElementById('inv-frames'), ti: document.getElementById('inv-titles') }; Object.values(grids).forEach(g => g.innerHTML = '');
-    profileData.ownedTitles.forEach(t => { const span = document.createElement('div'); span.className = `title-tag ${profileData.title === t ? 'active' : ''}`; span.innerText = t; span.onclick = () => { profileData.title = t; renderInventory(); updateUI(); }; grids.ti.appendChild(span); });
+    profileData.ownedTitles.forEach(t => { const span = document.createElement('div'); span.className = `title-tag ${profileData.title === t ? 'active' : ''}`; span.innerText = t; span.onclick = () => { profileData.title = t; renderInventory(); updateUI();
+    }; grids.ti.appendChild(span); });
     profileData.ownedAvatars.forEach(url => { let img = document.createElement('img'); img.src = url; img.className = 'inv-item'; img.style.cssText = `width:60px; height:60px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.avatar === url ? '#ffcc00' : 'transparent'};`; img.onclick = () => { profileData.avatar = url; updateUI(); renderInventory(); }; grids.av.appendChild(img); });
-    let noFr = document.createElement('div'); noFr.className = 'inv-item'; noFr.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.frame === '' ? '#ffcc00' : '#444'}; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5);`; noFr.innerHTML = '❌'; noFr.onclick = () => { profileData.frame = ''; updateUI(); renderInventory(); }; grids.fr.appendChild(noFr);
+    let noFr = document.createElement('div'); noFr.className = 'inv-item'; noFr.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.frame === '' ?
+    '#ffcc00' : '#444'}; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5);`; noFr.innerHTML = '❌'; noFr.onclick = () => { profileData.frame = ''; updateUI();
+    renderInventory(); }; grids.fr.appendChild(noFr);
     profileData.ownedFrames.forEach(c => { let div = document.createElement('div'); div.className = 'inv-item ' + (c === 'fire_gradient' ? 'fire-frame' : ''); div.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; ${c === 'fire_gradient' ? '' : 'border:4px solid '+c}; box-shadow: ${profileData.frame === c ? '0 0 15px orange' : 'none'};`; div.onclick = () => { profileData.frame = c; updateUI(); renderInventory(); }; grids.fr.appendChild(div); });
 }
 
 function updateUI() {
     document.getElementById('market-medal-count').innerText = medals; document.getElementById('challenge-medal-count').innerText = medals; document.getElementById('display-name').innerText = profileData.name; document.getElementById('display-avatar').src = profileData.avatar;
-    const f = document.getElementById('display-frame'); f.className = "avatar-frame"; if(profileData.frame === 'fire_gradient') f.classList.add('fire-frame'); else f.style.border = profileData.frame ? `4px solid ${profileData.frame}` : 'none';
+    const f = document.getElementById('display-frame'); f.className = "avatar-frame"; if(profileData.frame === 'fire_gradient') f.classList.add('fire-frame'); else f.style.border = profileData.frame ?
+    `4px solid ${profileData.frame}` : 'none';
     document.getElementById('display-title').innerText = profileData.title; document.getElementById('name-input').value = profileData.name;
-    let emoji = wins < 20 ? "⛓️" : wins < 40 ? "🥈" : wins < 60 ? "🥇" : "💎"; document.getElementById('rank-emoji').innerText = emoji;
-    document.getElementById('rank-name').innerText = wins < 20 ? "Demir" : wins < 40 ? "Gümüş" : wins < 60 ? "Altın" : "Elmas";
-    const ticks = document.getElementById('win-ticks'); ticks.innerHTML = ''; for(let i=0; i<20; i++) { let t = document.createElement('div'); t.className = 'tick' + (i < (wins % 20) ? ' active' : ''); ticks.appendChild(t); }
+    let emoji = wins < 20 ?
+    "⛓️" : wins < 40 ? "🥈" : wins < 60 ? "🥇" : "💎"; document.getElementById('rank-emoji').innerText = emoji;
+    document.getElementById('rank-name').innerText = wins < 20 ? "Demir" : wins < 40 ? "Gümüş" : wins < 60 ?
+    "Altın" : "Elmas";
+    const ticks = document.getElementById('win-ticks'); ticks.innerHTML = ''; for(let i=0; i<20; i++) { let t = document.createElement('div');
+    t.className = 'tick' + (i < (wins % 20) ? ' active' : ''); ticks.appendChild(t); }
 }
 
-function saveProfile() { localStorage.setItem('weekWorldProfile', JSON.stringify(profileData)); }
+function saveProfile() { localStorage.setItem('weekWorldProfile', JSON.stringify(profileData));
+}
 function openMarket() { document.getElementById('market-menu').style.display = 'flex'; initMarket(); updateUI(); }
 function closeMarket() { document.getElementById('market-menu').style.display = 'none'; }
-function openChallenges() { document.getElementById('challenge-menu').style.display = 'flex'; updateUI(); }
+function openChallenges() { document.getElementById('challenge-menu').style.display = 'flex';
+updateUI(); }
 function closeChallenges() { document.getElementById('challenge-menu').style.display = 'none'; }
-function openProfileEdit() { document.getElementById('profile-edit-menu').style.display = 'flex'; renderInventory(); }
-function closeProfileEdit() { profileData.name = document.getElementById('name-input').value || profileData.name; saveProfile(); updateUI(); document.getElementById('profile-edit-menu').style.display = 'none'; }
+function openProfileEdit() { document.getElementById('profile-edit-menu').style.display = 'flex'; renderInventory();
+}
+function closeProfileEdit() { profileData.name = document.getElementById('name-input').value || profileData.name; saveProfile(); updateUI(); document.getElementById('profile-edit-menu').style.display = 'none';
+}
 
 /* --- ŞEHİRLER --- */
-var citiesEasy = [["İstanbul", 41.00, 28.97], ["Ankara", 39.93, 32.85], ["İzmir", 38.41, 27.12], ["Antalya", 36.89, 30.71], ["Londra", 51.50, -0.12], ["Paris", 48.85, 2.35], ["Berlin", 52.52, 13.40], ["Roma", 41.90, 12.49], ["Madrid", 40.41, -3.70], ["Tokyo", 35.67, 139.65], ["New York", 40.71, -74.00], ["Sidney", -33.86, 151.20], ["Moskova", 55.75, 37.61], ["Dubai", 25.20, 55.27], ["Amsterdam", 52.36, 4.89], ["Brüksel", 50.85, 4.35], ["Viyana", 48.20, 16.37], ["Atina", 37.98, 23.72], ["Kahire", 30.04, 31.23], ["Pekin", 39.90, 116.40], ["Seul", 37.56, 126.97], ["Rio de Janeiro", -22.90, -43.17], ["Buenos Aires", -34.60, -58.38], ["Toronto", 43.65, -79.38], ["Los Angeles", 34.05, -118.24], ["Meksika City", 19.43, -99.13], ["Bangkok", 13.75, 100.50], ["Singapur", 1.35, 103.81], ["Lizbon", 38.72, -9.13], ["Stokholm", 59.32, 18.06]];
-var citiesHard = [["Varşova", 52.22, 21.01], ["Prag", 50.07, 14.43], ["Budapeşte", 47.49, 19.04], ["Cape Town", -33.92, 18.42], ["Helsinki", 60.16, 24.93], ["Oslo", 59.91, 10.75], ["Kopenhag", 55.67, 12.56], ["Zürih", 47.37, 8.54], ["Dublin", 53.34, -6.26], ["Reykjavik", 64.12, -21.82], ["Yeni Delhi", 28.61, 77.20], ["Kuala Lumpur", 3.13, 101.68], ["Manila", 14.59, 120.98], ["Cakarta", -6.20, 106.84], ["Santiago", -33.44, -70.66], ["Lima", -12.04, -77.04], ["Bogota", 4.71, -74.07], ["Hanoi", 21.02, 105.83], ["Taipei", 25.03, 121.56], ["Bükreş", 44.42, 26.10], ["Belgrad", 44.78, 20.44], ["Sofya", 42.69, 23.32], ["Lagos", 6.52, 3.37], ["Nairobi", -1.29, 36.82], ["Kazablanka", 33.57, -7.58], ["Bakü", 40.40, 49.86], ["Tiflis", 41.71, 44.78], ["Astana", 51.16, 71.47], ["Amman", 31.94, 35.92], ["Beyrut", 33.89, 35.50], ["Riyad", 24.71, 46.67], ["Tel Aviv", 32.08, 34.78], ["Kiev", 50.45, 30.52], ["Perth", -31.95, 115.86]];
+var citiesEasy = [["İstanbul", 41.00, 28.97], ["Ankara", 39.93, 32.85], ["İzmir", 38.41, 27.12], ["Antalya", 36.89, 30.71], ["Londra", 51.50, -0.12], ["Paris", 48.85, 2.35], ["Berlin", 52.52, 13.40], ["Roma", 41.90, 12.49], ["Madrid", 40.41, -3.70], ["Tokyo", 35.67, 139.65], ["New York", 40.71, -74.00], ["Sidney", -33.86, 151.20], ["Moskova", 55.75, 37.61], ["Dubai", 25.20, 55.27], ["Amsterdam", 52.36, 4.89], ["Brüksel", 50.85, 4.35], ["Viyana", 48.20, 16.37], ["Atina", 37.98, 23.72], ["Kahire", 30.04, 31.23], ["Pekin", 39.90, 116.40], ["Seul", 37.56, 126.97], ["Rio de Janeiro", -22.90, -43.17], ["Buenos Aires", -34.60, -58.38], ["Toronto", 43.65, -79.38], ["Los Angeles", 34.05, -118.24], ["Meksika City", 19.43, -99.13], ["Bangkok", 13.75, 100.50], ["Singapur", 1.35, 103.81], ["Lizbon", 38.72, -9.13], 
+["Stokholm", 59.32, 18.06]];
+var citiesHard = [["Varşova", 52.22, 21.01], ["Prag", 50.07, 14.43], ["Budapeşte", 47.49, 19.04], ["Cape Town", -33.92, 18.42], ["Helsinki", 60.16, 24.93], ["Oslo", 59.91, 10.75], ["Kopenhag", 55.67, 12.56], ["Zürih", 47.37, 8.54], ["Dublin", 53.34, -6.26], ["Reykjavik", 64.12, -21.82], ["Yeni Delhi", 28.61, 77.20], ["Kuala Lumpur", 3.13, 101.68], ["Manila", 14.59, 120.98], ["Cakarta", -6.20, 106.84], ["Santiago", -33.44, -70.66], ["Lima", -12.04, -77.04], ["Bogota", 4.71, -74.07], ["Hanoi", 21.02, 105.83], ["Taipei", 25.03, 121.56], ["Bükreş", 44.42, 26.10], ["Belgrad", 44.78, 20.44], ["Sofya", 42.69, 23.32], ["Lagos", 6.52, 3.37], ["Nairobi", -1.29, 36.82], ["Kazablanka", 33.57, -7.58], ["Bakü", 40.40, 49.86], ["Tiflis", 41.71, 44.78], ["Astana", 51.16, 71.47], ["Amman", 31.94, 35.92], ["Beyrut", 33.89, 35.50], ["Riyad", 
+24.71, 46.67], ["Tel Aviv", 32.08, 34.78], ["Kiev", 50.45, 30.52], ["Perth", -31.95, 115.86]];
 
 /* --- OYUN MANTIĞI --- */
 var map = L.map('map', {zoomControl: false, attributionControl: false, worldCopyJump: true}).setView([20,0], 3);
@@ -631,7 +770,8 @@ function startGame() {
     document.getElementById('game-top-bar').style.visibility = 'visible';
     document.getElementById('game-bottom-bar').style.visibility = 'visible';
     document.getElementById('timer').style.visibility = (currentMode === 'hardcore' ? 'hidden' : 'visible');
-    if(currentMode === 'blind_shot') { map.removeLayer(baseLayer); blindLayer.addTo(map); timeLeft = 180; } 
+    if(currentMode === 'blind_shot') { map.removeLayer(baseLayer); blindLayer.addTo(map); timeLeft = 180;
+    } 
     else { map.removeLayer(blindLayer); baseLayer.addTo(map); }
     startRound(true);
 }
@@ -647,12 +787,22 @@ function startRound(first = false) {
     let pool = Math.random() < 0.5 ? citiesEasy : citiesHard; selectedCity = pool[Math.floor(Math.random()*pool.length)];
     document.getElementById("cityName").innerText = selectedCity[0].toLowerCase();
     roundActive = true; updateTimerUI(); clearInterval(timerInterval);
-    if(currentMode !== 'hardcore') { timerInterval = setInterval(() => { timeLeft--; updateTimerUI(); if(timeLeft<=0) gameOver("süre doldu!"); }, 1000); }
+    if(currentMode !== 'hardcore') { timerInterval = setInterval(() => { timeLeft--; updateTimerUI(); if(timeLeft<=0) gameOver("süre doldu!"); }, 1000);
+    }
 }
 
-function updateTimerUI() { let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById("timer").innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
+function updateTimerUI() { let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById("timer").innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
 
-map.on('click', (e) => { if(!roundActive) return; if(guessMarker) map.removeLayer(guessMarker); guessMarker = L.marker(e.latlng).addTo(map); document.getElementById("guessBtn").classList.add("active"); });
+map.on('click', (e) => { 
+    if(!roundActive) return; 
+    if(guessMarker) map.removeLayer(guessMarker); 
+    guessMarker = L.marker(e.latlng).addTo(map); 
+    document.getElementById("guessBtn").classList.add("active"); 
+
+    // Başarım Kontrolü: Penguenmi Görüyorum?
+    if (e.latlng.lat <= -60) unlockAchievement('penguin');
+});
 
 function makeGuess() {
     if(!roundActive || !guessMarker) return;
@@ -669,15 +819,27 @@ function makeGuess() {
             realMarker = L.marker(realPos).addTo(map);
             line = L.polyline([guessPos, realPos], {color: 'red', weight: 3}).addTo(map);
             let dist = Math.round(map.distance(guessPos, realPos) / 1000);
-            if(currentMode === 'hardcore' && dist > 500) { gameOver(`hata payını aştın! mesafe: ${dist} km`); return; }
+            if(currentMode === 'hardcore' 
+            && dist > 500) { gameOver(`hata payını aştın! mesafe: ${dist} km`); return; }
             if(currentMode === 'speedrun' && dist <= 500) timeLeft = 60;
             let roundScore = Math.max(0, 5000 - (dist * 5));
             score += roundScore;
             document.getElementById("distanceBox").innerText = `${dist} km | +${roundScore} puan`;
             document.getElementById("distanceBox").style.display = "block";
+ 
             animateScoreWithOverlay(roundScore);
             
-            // Başarım Kontrolleri
+            // Başarım Kontrolü: Durmak Yok!
+            if (roundScore >= 4500) {
+                streak4500++;
+                localStorage.setItem('weekWorldStreak4500', streak4500);
+                if (streak4500 >= 3) unlockAchievement('unstoppable');
+            } else {
+                streak4500 = 0;
+                localStorage.setItem('weekWorldStreak4500', streak4500);
+            }
+
+            // Diğer Başarım Kontrolleri
             if (roundScore === 5000) unlockAchievement('guess_5k');
             if (roundScore > 0) unlockAchievement('first_right');
             if (roundScore === 0) unlockAchievement('first_wrong');
@@ -689,7 +851,8 @@ function makeGuess() {
 
 function startMola() {
     let molaTime = 5; let mBase = timeLeft;
-    document.getElementById("timer").innerText = "mola: " + molaTime; clearInterval(nextRoundInterval);
+    document.getElementById("timer").innerText = "mola: " + molaTime;
+    clearInterval(nextRoundInterval);
     nextRoundInterval = setInterval(() => { 
         molaTime--; 
         document.getElementById("timer").innerText = "mola: " + molaTime; 
@@ -697,7 +860,8 @@ function startMola() {
         if(molaTime <= 0) { 
             clearInterval(nextRoundInterval); timeLeft = mBase; 
             const curtain = document.getElementById('transition-curtain'); curtain.classList.add('active'); 
-            setTimeout(() => { map.setView([20,0], 3); startRound(); setTimeout(() => { curtain.classList.remove('active'); }, 200); }, 600); 
+           
+             setTimeout(() => { map.setView([20,0], 3); startRound(); setTimeout(() => { curtain.classList.remove('active'); }, 200); }, 600); 
         } 
     }, 1000);
 }
@@ -709,8 +873,10 @@ function gameOver(msg) {
 
 function showFinalScreen() { 
     const isCh = ['blind_shot', 'total_time'].includes(currentMode); 
-    if(!isCh) { wins++; localStorage.setItem('weekWorldWins', wins); } 
-    else { medals++; localStorage.setItem('weekWorldMedals', medals); } 
+    if(!isCh) { wins++; localStorage.setItem('weekWorldWins', wins);
+    } 
+    else { medals++; localStorage.setItem('weekWorldMedals', medals);
+    } 
     
     // YENİ BAŞARIM KONTROLLERİ
     if(currentMode === 'blind_shot' && score >= 20000) unlockAchievement('blind_20k');
@@ -727,9 +893,9 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); rend
 const globe = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') })); scene.add(globe);
 const light = new THREE.DirectionalLight(0xffffff, 1.3); light.position.set(5,3,5); scene.add(light); scene.add(new THREE.AmbientLight(0x666666)); camera.position.z = 5.5;
 let isDrg = false, prevM = {x:0, y:0}; document.getElementById('world-3d-container').onmousedown = () => isDrg = true;
-window.onmouseup = () => isDrg = false; window.onmousemove = (e) => { if(isDrg) { globe.rotation.y += (e.clientX - prevM.x)*0.01; globe.rotation.x += (e.clientY - prevM.y)*0.01; } prevM = {x:e.clientX, y:e.clientY}; };
+window.onmouseup = () => isDrg = false; window.onmousemove = (e) => { if(isDrg) { globe.rotation.y += (e.clientX - prevM.x)*0.01;
+globe.rotation.x += (e.clientY - prevM.y)*0.01; } prevM = {x:e.clientX, y:e.clientY}; };
 function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); } animate(); updateUI();
-
 // OYUN SÜRESİ
 setInterval(() => { 
     totalSeconds++; 
