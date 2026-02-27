@@ -16,63 +16,53 @@
     /* SES KONTROL BUTONU */
     #music-toggle {
         position: fixed; top: 20px; left: 20px; z-index: 30005;
-        background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white; padding: 10px; border-radius: 50%; width: 50px; height: 50px;
+        background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white;
+        padding: 10px; border-radius: 50%; width: 50px; height: 50px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px; cursor: pointer; backdrop-filter: blur(5px);
-        transition: 0.3s; user-select: none;
+        font-size: 24px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s; user-select: none;
     }
     #music-toggle:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
 
     /* GEÇİŞ PERDESİ */
     #transition-curtain {
         position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%;
-        background: #000; z-index: 30000; transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        pointer-events: none;
+        background: #000; z-index: 30000; transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none;
     }
     #transition-curtain.active { bottom: 0; }
 
     /* MENÜ VE EKRANLAR */
-    #main-menu, #challenge-menu, #profile-edit-menu, #market-menu {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-        background: #050505; z-index: 9999;
-        display: flex; justify-content: space-between; align-items: center;
-        transition: opacity 0.5s ease;
+    #main-menu, #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #050505; z-index: 9999;
+        display: flex; justify-content: space-between; align-items: center; transition: opacity 0.5s ease;
     }
-    #challenge-menu, #profile-edit-menu, #market-menu { display: none; flex-direction: column; justify-content: center; z-index: 10001; }
+    #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu { display: none; flex-direction: column; justify-content: center; z-index: 10001; }
 
     /* GEÇİŞ EKRANI */
     #start-countdown-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: radial-gradient(circle, #1a1a1a 0%, #000 100%); z-index: 20000;
-        display: none; flex-direction: column; align-items: center; justify-content: center;
-        text-align: center;
+        display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;
     }
     .slide-up-out { animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     @keyframes slideUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
     .countdown-number { font-size: 12rem; font-weight: 900; color: white; animation: pulseNumber 1s infinite; }
     @keyframes pulseNumber { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
 
-    /* YENİ PUAN ANİMASYON KATMANI */
+    /* PUAN ANİMASYON KATMANI */
     #score-animation-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        z-index: 50000; display: none; align-items: center; justify-content: center;
-        pointer-events: none;
+        z-index: 50000; display: none; align-items: center; justify-content: center; pointer-events: none;
     }
     .score-anim-container { position: relative; display: flex; align-items: center; justify-content: center; }
-    .big-score-text { 
-        font-size: 10rem; font-weight: 900; color: #ffcc00; 
-        transform: scale(0); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+    .big-score-text { font-size: 10rem; font-weight: 900; color: #ffcc00; transform: scale(0); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .added-score-text {
-        position: absolute; top: -60px; left: -40px;
-        font-size: 4rem; font-weight: 900; color: #ffcc00;
+        position: absolute; top: -60px; left: -40px; font-size: 4rem; font-weight: 900; color: #ffcc00;
         opacity: 0; transform: translateY(20px); transition: 0.5s ease-out;
     }
     .big-score-text.active { transform: scale(1); }
     .added-score-text.active { opacity: 1; transform: translateY(0); }
 
-    /* MARKET */
+    /* MARKET VE DİĞER MENÜLER */
     .market-header { position: absolute; top: 30px; right: 50px; display: flex; align-items: center; gap: 15px; font-size: 24px; font-weight: bold; color: #ffcc00; }
     .market-container { width: 90%; max-height: 85vh; overflow-y: auto; padding: 20px; text-align: center; }
     .market-section-title { font-size: 1.8rem; color: #ffcc00; margin: 40px 0 20px 0; border-bottom: 2px solid #333; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
@@ -99,6 +89,12 @@
     .mode-desc { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 85%; font-size: 0.85rem; color: #ffcc00; opacity: 0; transition: 0.3s; pointer-events: none; }
     .mode-card:hover .mode-title { opacity: 0; }
     .mode-card:hover .mode-desc { opacity: 1; }
+    
+    .achv-card { cursor: default; transition: 0.4s; }
+    .achv-card:hover { border-color: #9c27b0; transform: translateY(-5px); background: rgba(156, 39, 176, 0.1); }
+    .achv-title { font-size: 1.4rem; font-weight: 900; color: white; transition: 0.3s; }
+    .achv-card:hover .achv-title { opacity: 0; }
+    .achv-card:hover .mode-desc { opacity: 1; }
 
     .side-menu-right { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 10000; }
     .panel-box { background: rgba(20, 25, 35, 0.9); padding: 15px 20px; border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1); width: 260px; }
@@ -114,20 +110,65 @@
     .title-tag { background: #222; border: 1px solid #444; color: #eee; padding: 8px 15px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; }
     .title-tag.active { background: #ffcc00; color: #000; font-weight: bold; border-color: #ffcc00; }
 
-    /* OYUN UI */
+    /* MOR VE SARI TASARIM */
     .top-bar{ position:absolute;top:20px;left:0;width:100%; display:flex;justify-content:space-between;padding:0 30px;box-sizing:border-box;z-index:1000; visibility: hidden; pointer-events: none;}
-    .city-box{background:#ffcc00;padding:12px 25px;border-radius:12px;font-weight:bold; color:black; font-size: 20px; pointer-events: auto;}
-    .score-box{background:#00c853;color:white;padding:12px 25px;border-radius:12px;font-weight:bold; min-width:140px; text-align:center; pointer-events: auto;}
-    .timer-box{ position:absolute;top:20px;left:50%;transform:translateX(-50%); background:#ff3d00;color:white;padding:12px 30px;border-radius:20px; font-weight:bold; font-size: 22px; z-index:1000; visibility: hidden;}
+    .city-box{
+        background: #6a1b9a; padding:12px 25px; border-radius:12px; 
+        color:#ffcc00; font-size: 20px; pointer-events: auto;
+        font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: lowercase;
+    }
+    .score-box{
+        background: #6a1b9a; color:#ffcc00; padding:12px 25px; border-radius:12px; 
+        min-width:140px; text-align:center; pointer-events: auto;
+        font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: lowercase;
+    }
+    .timer-box{ 
+        position:absolute; top:20px; left:50%; transform:translateX(-50%); 
+        background: #6a1b9a; color:#ffcc00; padding:12px 30px; border-radius:20px; 
+        font-size: 22px; z-index:1000; visibility: hidden;
+        font-family: 'Arial Black', 'Gadget', sans-serif;
+    }
     .distance-box{ position:absolute;top:85px;left:50%;transform:translateX(-50%); background:#2962ff;color:white;padding:10px 25px;border-radius:20px; font-weight:bold;z-index:1000;display:none; }
     .bottom-bar{ position:absolute;bottom:40px;left:50%;transform:translateX(-50%); z-index:1000; visibility: hidden;}
-    .guess-btn { padding:16px 60px;font-size:20px;border-radius:40px; background:#2962ff;color:white;cursor:pointer;font-weight:bold; border:none; opacity: 0.4; pointer-events: none; transition: 0.3s; }
+    .guess-btn { 
+        padding:16px 60px; font-size:20px; border-radius:40px; 
+        background: #6a1b9a; color:#ffcc00; cursor:pointer; border:none; 
+        opacity: 0.4; pointer-events: none; transition: 0.3s; 
+        font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: lowercase;
+    }
     .guess-btn.active { opacity: 1; pointer-events: auto; }
+
     .result-box{ position:fixed;top:50%;left:50%;transform:translate(-50%,-50%); background:white;padding:40px;border-radius:24px; z-index:10001; display:none; text-align:center; color: black; }
     .back-btn { padding: 12px 30px; background: rgba(255,255,255,0.1); color: white; border-radius: 10px; cursor: pointer; border: 1px solid #444; font-weight: bold;}
     .win-bar { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; display: flex; gap: 2px; padding: 2px; }
     .tick { flex: 1; background: rgba(255,255,255,0.1); border-radius: 2px; }
     .tick.active { background: #ffcc00; }
+
+    /* BAŞARIM BİLDİRİM EKRANI */
+    #achv-notification {
+        position: fixed;
+        bottom: 40px;
+        right: -400px;
+        background: #6a1b9a;
+        color: white;
+        padding: 20px 30px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 0 20px rgba(106, 27, 154, 0.8);
+        z-index: 99999;
+        transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .achv-notif-text-container { display: flex; flex-direction: column; position: relative; }
+    #achv-medal-badge {
+        position: absolute; top: -10px; right: -20px; background: #ffcc00; color: black;
+        font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 10px; display: none;
+    }
+
+    /* ÖZEL ÇERÇEVELER */
+    .fire-frame { border: 4px solid transparent !important; background-image: linear-gradient(#000, #000), linear-gradient(to right, orange, red, yellow); background-origin: border-box; background-clip: content-box, border-box; animation: rotateGradient 2s linear infinite; }
+    @keyframes rotateGradient { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 </style>
 </head>
 <body onclick="initFirstAudio()">
@@ -147,6 +188,15 @@
     <div id="countdown-num" class="countdown-number">5</div>
 </div>
 
+<div id="achv-notification">
+    <span id="achv-notif-emoji" style="font-size: 35px;">🏅</span>
+    <div class="achv-notif-text-container">
+        <div id="achv-medal-badge">+1 🏆</div>
+        <span style="font-size: 13px; font-weight: bold; color: #e1bee7; margin-bottom: 3px;">BAŞARIM KAZANILDI</span>
+        <span id="achv-notif-title" style="font-size: 18px; font-weight: 900; opacity: 0; transition: opacity 1s ease-in;">Şampiyon</span>
+    </div>
+</div>
+
 <div id="main-menu">
     <div class="side-menu-left">
         <div class="mode-card" onclick="startCountdown('normal')"><span class="mode-title">🌍 DÜNYA MODU</span><span class="mode-desc">Klasik deneyim. Hedef 25.000 puan.</span></div>
@@ -154,11 +204,13 @@
         <div class="mode-card" onclick="startCountdown('hardcore')"><span class="mode-title">🧭 ZOR MOD</span><span class="mode-desc">Hata payı yok (500km sınır).</span></div>
         <div class="mode-card" onclick="openChallenges()"><span class="mode-title">📚 MEYDAN OKUMALAR</span><span class="mode-desc">Özel ödüller ve madalyalar kazan.</span></div>
     </div>
+    
     <div class="center-stage">
         <h1 class="game-title">Week.world</h1>
         <div id="world-3d-container"></div>
         <div class="disclaimer-text">Oyunumuz tamamıyla eğlence amaçlıdır herhangi bir para kazanma gibi bir amacımız yoktur!</div>
     </div>
+    
     <div class="side-menu-right">
         <div class="panel-box mini-profile" onclick="openProfileEdit()">
             <div style="display:flex; align-items:center; gap:15px;">
@@ -170,6 +222,17 @@
         <div class="panel-box"><div style="font-size: 10px; color: #888;">TOPLAM OYNAMA SÜRESİ</div><div id="playtime-display" style="font-size: 14px; font-weight: bold; color: #ffcc00; margin-top: 5px;">0 Gün 0 Saat 0 Dakika</div></div>
         <button class="buy-btn" style="height:50px; font-size:16px; background: linear-gradient(45deg, #6200ea, #2962ff);" onclick="openMarket()">🛒 MARKET</button>
     </div>
+
+    <div class="mode-card" style="position: absolute; bottom: 30px; right: 30px; z-index: 10000; width: 260px;" onclick="openAchievements()">
+        <span class="mode-title">🏅 BAŞARIMLAR</span>
+        <span class="mode-desc">Başarımları Görüntüle</span>
+    </div>
+</div>
+
+<div id="achievement-menu">
+    <h2 id="achv-header" style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-bottom: 40px; margin-top: 50px;">Sahip olunan başarımlar: 0</h2>
+    <div id="achv-grid" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 900px; padding: 20px; overflow-y: auto;"></div>
+    <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeAchievements()">← GERİ DÖN</button>
 </div>
 
 <div id="market-menu">
@@ -204,10 +267,15 @@
     <button class="back-btn" style="margin-top: 20px; width: 200px; background: #2962ff; border: none;" onclick="closeProfileEdit()">KAYDET VE ÇIK</button>
 </div>
 
-<div class="top-bar" id="game-top-bar"><div class="city-box">Hedef: <span id="cityName">Şehir</span></div><div class="score-box">Puan: <span id="score">0</span></div></div>
+<div class="top-bar" id="game-top-bar">
+    <div class="city-box">hedef: <span id="cityName">şehir</span></div>
+    <div class="score-box">puan: <span id="score">0</span></div>
+</div>
 <div class="timer-box" id="timer">02:00</div>
 <div class="distance-box" id="distanceBox"></div>
-<div class="bottom-bar" id="game-bottom-bar"><button class="guess-btn" id="guessBtn" onclick="makeGuess()">TAHMİN ET</button></div>
+<div class="bottom-bar" id="game-bottom-bar">
+    <button class="guess-btn" id="guessBtn" onclick="makeGuess()">tahmin et</button>
+</div>
 <div class="result-box" id="result"></div>
 <div id="map"></div>
 
@@ -217,6 +285,21 @@ let wins = parseInt(localStorage.getItem('weekWorldWins')) || 0;
 let medals = parseInt(localStorage.getItem('weekWorldMedals')) || 0;
 let totalSeconds = parseInt(localStorage.getItem('weekWorldPlaytime')) || 0;
 let profileData = JSON.parse(localStorage.getItem('weekWorldProfile')) || { name: "Oyuncu", title: "YENİ OYUNCU", avatar: "https://i.ibb.co/vz6mXmX/default-avatar.png", frame: "", ownedAvatars: ["https://i.ibb.co/vz6mXmX/default-avatar.png"], ownedFrames: [], ownedTitles: ["YENİ OYUNCU", "GEZGİN"] };
+
+/* --- BAŞARIMLAR VERİ TABANI --- */
+let unlockedAchievements = JSON.parse(localStorage.getItem('weekWorldAchievements')) || [];
+const achievementsData = [
+    { id: 'guess_5k', title: '5.000 Puan', desc: 'Harita üzerinde 5.000 puanlık tahmin yap', emoji: '🎯', reward: 3 },
+    { id: 'atlas_50', title: 'Atlas Uzmanı', desc: 'Oyun üzerinde 50 galibiyete ulaş!', emoji: '🗺️', reward: 10 },
+    { id: 'map_100', title: 'Harita Yazarı', desc: 'Oyun üzerinde 100 galibiyete ulaş!', emoji: '✍️', reward: 20 },
+    { id: 'champ_30', title: 'Şampiyon', desc: 'Meydan okumalardan 30 madalya topla.', emoji: '🏆', reward: 0 },
+    { id: 'first_wrong', title: 'İlk Yanlış', desc: 'İlk yanlış tahminini yaptın.', emoji: '❌', reward: 1 },
+    { id: 'first_right', title: 'İlk Doğru', desc: 'İlk doğru tahminin yaptım.', emoji: '✅', reward: 1 },
+    { id: 'blind_20k', title: 'Zifiri Karanlık', desc: 'Kör Atış modunda 20.000 puan barajını aş!', emoji: '🌑', reward: 5 },
+    { id: 'hard_win', title: 'Çelik Sinirler', desc: 'Zor Modda (Hardcore) galibiyet al.', emoji: '🧭', reward: 5 },
+    { id: 'loyal_10h', title: 'Sadık Oyuncu', desc: 'Toplam 10 saat oynama süresine ulaş.', emoji: '⏳', reward: 5 }
+];
+
 /* --- SES MOTORU --- */
 let audioCtx = null, musicLoopInterval = null, currentMusicType = null;
 let isMusicMuted = localStorage.getItem('weekWorldMuted') === 'true';
@@ -239,21 +322,39 @@ function toggleGlobalMusic(event) {
     isMusicMuted = !isMusicMuted;
     localStorage.setItem('weekWorldMuted', isMusicMuted);
     updateMuteUI();
-    if (isMusicMuted) stopMusic();
+    if (isMusicMuted) { stopMusic(); } 
     else {
         if (document.getElementById('main-menu').style.visibility !== 'hidden') startLobbyMusic();
         else if (roundActive) startGameMusic();
     }
 }
 
-function stopMusic() { if (musicLoopInterval) { clearInterval(musicLoopInterval); musicLoopInterval = null; } currentMusicType = null; }
+function stopMusic() { 
+    if (musicLoopInterval) { clearInterval(musicLoopInterval); musicLoopInterval = null; } 
+    currentMusicType = null;
+}
 
 function startLobbyMusic() {
     if (isMusicMuted || currentMusicType === 'lobby') return;
     stopMusic(); currentMusicType = 'lobby';
     const masterGain = audioCtx.createGain(); masterGain.gain.setValueAtTime(0, audioCtx.currentTime); masterGain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 2); masterGain.connect(audioCtx.destination);
     let step = 0;
-    musicLoopInterval = setInterval(() => { if (isMusicMuted) return; const now = audioCtx.currentTime; const chords = [130.81, 174.61, 196.00, 130.81]; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.frequency.setValueAtTime(chords[Math.floor(step / 4) % 4], now); g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.05, now + 1); g.gain.linearRampToValueAtTime(0, now + 3); osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now + 4); step++; }, 1000);
+    musicLoopInterval = setInterval(() => { 
+        if (isMusicMuted) return; 
+        const now = audioCtx.currentTime; 
+        const chords = [130.81, 174.61, 196.00, 130.81]; 
+        const osc = audioCtx.createOscillator(); 
+        const g = audioCtx.createGain(); 
+        osc.frequency.setValueAtTime(chords[Math.floor(step / 4) % 4], now); 
+        g.gain.setValueAtTime(0, now); 
+        g.gain.linearRampToValueAtTime(0.05, now + 1); 
+        g.gain.linearRampToValueAtTime(0, now + 3); 
+        osc.connect(g); 
+        g.connect(masterGain); 
+        osc.start(now); 
+        osc.stop(now + 4); 
+        step++; 
+    }, 1000);
 }
 
 function startGameMusic() {
@@ -261,22 +362,34 @@ function startGameMusic() {
     stopMusic(); currentMusicType = 'game';
     const masterGain = audioCtx.createGain(); masterGain.gain.setValueAtTime(0.1, audioCtx.currentTime); masterGain.connect(audioCtx.destination);
     let step = 0;
-    musicLoopInterval = setInterval(() => { if (isMusicMuted) return; const now = audioCtx.currentTime; const arpeggio = [261.63, 329.63, 392.00, 523.25]; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.type = 'triangle'; osc.frequency.setValueAtTime(arpeggio[step % 4], now); g.gain.setValueAtTime(0.04, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.2); osc.connect(g); g.connect(masterGain); osc.start(now); osc.stop(now + 0.2); step++; }, 250);
+    musicLoopInterval = setInterval(() => { 
+        if (isMusicMuted) return; 
+        const now = audioCtx.currentTime; 
+        const arpeggio = [261.63, 329.63, 392.00, 523.25]; 
+        const osc = audioCtx.createOscillator(); 
+        const g = audioCtx.createGain(); 
+        osc.type = 'triangle'; 
+        osc.frequency.setValueAtTime(arpeggio[step % 4], now); 
+        g.gain.setValueAtTime(0.04, now); 
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.2); 
+        osc.connect(g); 
+        g.connect(masterGain); 
+        osc.start(now); 
+        osc.stop(now + 0.2); 
+        step++; 
+    }, 250);
 }
 
-// Dürbün Yakınlaştırma Sesi (Minecraft Tarzı Klik)
 function playBinocularSound() {
     if (isMusicMuted || !audioCtx) return;
     const now = audioCtx.currentTime;
-    // Minecraft dürbün açma sesine benzer keskin klik ve hafif tiz metalik tınlama
-    const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
     osc.type = 'square'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
     g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(); osc.stop(now + 0.15);
+    osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(now + 0.15);
 }
 
-// Rüzgar Sesi
 function playWindSound(duration) {
     if (isMusicMuted || !audioCtx) return;
     const bufferSize = audioCtx.sampleRate * duration;
@@ -287,11 +400,9 @@ function playWindSound(duration) {
     const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(400, audioCtx.currentTime);
     filter.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + duration/2);
     const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.2); gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-    noise.connect(filter); filter.connect(gain);
-    gain.connect(audioCtx.destination); noise.start();
+    noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start();
 }
 
-// Saat Sesi (Tik / Tak)
 function playClockTick(isTak = false) {
     if (isMusicMuted || !audioCtx) return;
     const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
@@ -301,16 +412,16 @@ function playClockTick(isTak = false) {
     osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
-// Puan Artış Sesi (Minecraft Tecrübe Puanı Tarzı)
 function playScoreTick() {
     if (isMusicMuted || !audioCtx) return;
     const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
     osc.type = 'sine'; osc.frequency.setValueAtTime(600 + (Math.random()*400), audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
     osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
-/* --- YENİ PUAN ANİMASYON MANTIĞI --- */
+/* --- PUAN ANİMASYONU --- */
 function animateScoreWithOverlay(roundScore) {
     const overlay = document.getElementById('score-animation-overlay');
     const mainScoreTxt = document.getElementById('anim-main-score');
@@ -320,35 +431,26 @@ function animateScoreWithOverlay(roundScore) {
     const oldTotal = score - roundScore;
     const targetTotal = score;
 
-    // 1. Ekranı hazırla ve eski puanı devasa getir
     mainScoreTxt.innerText = oldTotal;
     addedScoreTxt.innerText = "+" + roundScore;
     overlay.style.display = 'flex';
     
     setTimeout(() => {
         mainScoreTxt.classList.add('active');
-        
-        // 2. 1 saniye sonra +3000 yazısı belirsin
         setTimeout(() => {
             addedScoreTxt.classList.add('active');
-
-            // 3. Puan artışı başlasın (hem ekranda hem panelde)
             let current = oldTotal;
             const steps = 30;
             const inc = roundScore / steps;
             let step = 0;
-
             const int = setInterval(() => {
                 step++;
                 current = Math.floor(oldTotal + (inc * step));
                 if(step >= steps) {
                     current = targetTotal;
                     clearInterval(int);
-                    
-                    // 4. +3000 yazısı kaybolsun
                     setTimeout(() => {
                         addedScoreTxt.classList.remove('active');
-                        // 5. 1.5 saniye sonra dev puan kaybolsun ve mola başlasın
                         setTimeout(() => {
                             mainScoreTxt.classList.remove('active');
                             setTimeout(() => {
@@ -362,9 +464,80 @@ function animateScoreWithOverlay(roundScore) {
                 panelScore.innerText = current;
                 playScoreTick();
             }, 50);
-
         }, 1000);
     }, 100);
+}
+
+/* --- BAŞARIM FONKSİYONLARI --- */
+function openAchievements() { document.getElementById('achievement-menu').style.display = 'flex'; renderAchievements(); }
+function closeAchievements() { document.getElementById('achievement-menu').style.display = 'none'; }
+function renderAchievements() {
+    document.getElementById('achv-header').innerText = `Sahip olunan başarımlar: ${unlockedAchievements.length}`;
+    const grid = document.getElementById('achv-grid'); grid.innerHTML = '';
+    achievementsData.forEach(achv => {
+        let isUnlocked = unlockedAchievements.includes(achv.id);
+        let card = document.createElement('div'); card.className = 'mode-card achv-card'; card.style.opacity = isUnlocked ? '1' : '0.5';
+        card.innerHTML = `<span class="achv-title">${achv.emoji} ${achv.title}</span><span class="mode-desc">${achv.desc}</span>`;
+        grid.appendChild(card);
+    });
+}
+
+let notifQueue = [];
+let isNotifPlaying = false;
+function showAchvNotification(achv) { notifQueue.push(achv); if (!isNotifPlaying) playNextNotif(); }
+function playNextNotif() {
+    if (notifQueue.length === 0) { isNotifPlaying = false; return; }
+    isNotifPlaying = true;
+    let achv = notifQueue.shift();
+    let notifEl = document.getElementById('achv-notification');
+    let titleEl = document.getElementById('achv-notif-title');
+    let medalBadge = document.getElementById('achv-medal-badge');
+
+    document.getElementById('achv-notif-emoji').innerText = achv.emoji;
+    titleEl.innerText = achv.title;
+    titleEl.style.opacity = "0";
+    
+    // Madalya ödülü varsa göster
+    if(achv.reward && achv.reward > 0) {
+        medalBadge.innerText = `+${achv.reward} 🏆`;
+        medalBadge.style.display = 'block';
+    } else {
+        medalBadge.style.display = 'none';
+    }
+
+    notifEl.style.right = "20px";
+    setTimeout(() => {
+        titleEl.style.opacity = "1";
+        setTimeout(() => {
+            notifEl.style.right = "-400px";
+            setTimeout(() => { playNextNotif(); }, 600);
+        }, 3000);
+    }, 600);
+}
+
+function unlockAchievement(id) {
+    if (!unlockedAchievements.includes(id)) {
+        unlockedAchievements.push(id);
+        localStorage.setItem('weekWorldAchievements', JSON.stringify(unlockedAchievements));
+        let achv = achievementsData.find(a => a.id === id);
+        
+        // Madalya ödülünü ekle
+        if(achv && achv.reward > 0) {
+            medals += achv.reward;
+            localStorage.setItem('weekWorldMedals', medals);
+            updateUI();
+        }
+
+        showAchvNotification(achv);
+        if(document.getElementById('achievement-menu').style.display === 'flex') renderAchievements();
+    }
+}
+
+function checkMilestoneAchievements() {
+    if (wins >= 50) unlockAchievement('atlas_50');
+    if (wins >= 100) unlockAchievement('map_100');
+    if (medals >= 30) unlockAchievement('champ_30');
+    if (totalSeconds >= 36000) unlockAchievement('loyal_10h');
 }
 
 /* --- MARKET VE ENVANTER --- */
@@ -445,13 +618,10 @@ function startCountdown(mode) {
     let c = 5; document.getElementById('countdown-num').innerText = c;
     let int = setInterval(() => { 
         c--; 
-        if(c > 0) {
-            document.getElementById('countdown-num').innerText = c;
-            playClockTick(c % 2 === 0);
-        } else { 
+        if(c > 0) { document.getElementById('countdown-num').innerText = c; playClockTick(c % 2 === 0); } 
+        else { 
             clearInterval(int); overlay.classList.add('slide-up-out'); 
-            setTimeout(() => { overlay.style.display='none'; 
-            if(!isMusicMuted) startGameMusic(); startGame(); }, 600); 
+            setTimeout(() => { overlay.style.display='none'; if(!isMusicMuted) startGameMusic(); startGame(); }, 600); 
         } 
     }, 1000);
 }
@@ -461,7 +631,8 @@ function startGame() {
     document.getElementById('game-top-bar').style.visibility = 'visible';
     document.getElementById('game-bottom-bar').style.visibility = 'visible';
     document.getElementById('timer').style.visibility = (currentMode === 'hardcore' ? 'hidden' : 'visible');
-    if(currentMode === 'blind_shot') { map.removeLayer(baseLayer); blindLayer.addTo(map); timeLeft = 180; } else { map.removeLayer(blindLayer); baseLayer.addTo(map); }
+    if(currentMode === 'blind_shot') { map.removeLayer(baseLayer); blindLayer.addTo(map); timeLeft = 180; } 
+    else { map.removeLayer(blindLayer); baseLayer.addTo(map); }
     startRound(true);
 }
 
@@ -474,8 +645,9 @@ function startRound(first = false) {
     if(currentMode === 'speedrun' && first) timeLeft = 60;
     else if(currentMode === 'normal') timeLeft = 120;
     let pool = Math.random() < 0.5 ? citiesEasy : citiesHard; selectedCity = pool[Math.floor(Math.random()*pool.length)];
-    document.getElementById("cityName").innerText = selectedCity[0]; roundActive = true; updateTimerUI(); clearInterval(timerInterval);
-    if(currentMode !== 'hardcore') { timerInterval = setInterval(() => { timeLeft--; updateTimerUI(); if(timeLeft<=0) gameOver("Süre Doldu!"); }, 1000); }
+    document.getElementById("cityName").innerText = selectedCity[0].toLowerCase();
+    roundActive = true; updateTimerUI(); clearInterval(timerInterval);
+    if(currentMode !== 'hardcore') { timerInterval = setInterval(() => { timeLeft--; updateTimerUI(); if(timeLeft<=0) gameOver("süre doldu!"); }, 1000); }
 }
 
 function updateTimerUI() { let m = Math.floor(timeLeft/60), s = timeLeft%60; document.getElementById("timer").innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
@@ -488,29 +660,28 @@ function makeGuess() {
     document.getElementById("guessBtn").style.display = "none";
     let realPos = L.latLng(selectedCity[1], selectedCity[2]);
     let guessPos = guessMarker.getLatLng();
-    
     playBinocularSound();
     map.flyTo(guessPos, 8, { duration: 1.5 });
-    
     setTimeout(() => {
         playWindSound(1.5);
         map.panTo(realPos, { animate: true, duration: 1.2 });
-        
         setTimeout(() => {
             realMarker = L.marker(realPos).addTo(map);
             line = L.polyline([guessPos, realPos], {color: 'red', weight: 3}).addTo(map);
             let dist = Math.round(map.distance(guessPos, realPos) / 1000);
-            if(currentMode === 'hardcore' && dist > 500) { gameOver(`Hata payını aştın! Mesafe: ${dist} km`); return; }
+            if(currentMode === 'hardcore' && dist > 500) { gameOver(`hata payını aştın! mesafe: ${dist} km`); return; }
             if(currentMode === 'speedrun' && dist <= 500) timeLeft = 60;
             let roundScore = Math.max(0, 5000 - (dist * 5));
             score += roundScore;
-    
-            document.getElementById("distanceBox").innerText = `${dist} km | +${roundScore} Puan`;
+            document.getElementById("distanceBox").innerText = `${dist} km | +${roundScore} puan`;
             document.getElementById("distanceBox").style.display = "block";
-            
-            // YENİ ANİMASYON TETİKLEMESİ
             animateScoreWithOverlay(roundScore);
-
+            
+            // Başarım Kontrolleri
+            if (roundScore === 5000) unlockAchievement('guess_5k');
+            if (roundScore > 0) unlockAchievement('first_right');
+            if (roundScore === 0) unlockAchievement('first_wrong');
+            
             if(score >= 25000) setTimeout(showFinalScreen, 4000);
         }, 1300);
     }, 2000);
@@ -518,26 +689,37 @@ function makeGuess() {
 
 function startMola() {
     let molaTime = 5; let mBase = timeLeft;
-    document.getElementById("timer").innerText = "Mola: " + molaTime; clearInterval(nextRoundInterval);
+    document.getElementById("timer").innerText = "mola: " + molaTime; clearInterval(nextRoundInterval);
     nextRoundInterval = setInterval(() => { 
         molaTime--; 
-        document.getElementById("timer").innerText = "Mola: " + molaTime; 
-        if(molaTime >= 0) { playClockTick(molaTime % 2 === 0); }
+        document.getElementById("timer").innerText = "mola: " + molaTime; 
+        if(molaTime >= 0) playClockTick(molaTime % 2 === 0);
         if(molaTime <= 0) { 
             clearInterval(nextRoundInterval); timeLeft = mBase; 
             const curtain = document.getElementById('transition-curtain'); curtain.classList.add('active'); 
-            setTimeout(() => { 
-                map.setView([20,0], 3); startRound(); 
-                setTimeout(() => { curtain.classList.remove('active'); }, 200); 
-            }, 600); 
+            setTimeout(() => { map.setView([20,0], 3); startRound(); setTimeout(() => { curtain.classList.remove('active'); }, 200); }, 600); 
         } 
     }, 1000);
 }
 
-function gameOver(msg) { clearInterval(timerInterval); clearInterval(nextRoundInterval); document.getElementById("result").style.display = "block";
-document.getElementById("result").innerHTML = `<h2>OYUN BİTTİ</h2><p>${msg}</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#ffcc00; border:none; border-radius:10px; font-weight:bold; color:black; cursor:pointer;\">LOBİYE DÖN</button>`; }
+function gameOver(msg) { 
+    clearInterval(timerInterval); clearInterval(nextRoundInterval); document.getElementById("result").style.display = "block";
+    document.getElementById("result").innerHTML = `<h2>oyun bitti</h2><p>${msg}</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#ffcc00; border:none; border-radius:10px; font-weight:bold; color:black; cursor:pointer;\">lobiye dön</button>`;
+}
 
-function showFinalScreen() { const isCh = ['blind_shot', 'total_time'].includes(currentMode); if(!isCh) { wins++; localStorage.setItem('weekWorldWins', wins); } else { medals++; localStorage.setItem('weekWorldMedals', medals); } document.getElementById("result").style.display = "block"; document.getElementById("result").innerHTML = `<h2 style="color:green">TEBRİKLER!</h2><p>25.000 Puan Barajını Geçtin!</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#2962ff; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;\">LOBİYE DÖN</button>`; }
+function showFinalScreen() { 
+    const isCh = ['blind_shot', 'total_time'].includes(currentMode); 
+    if(!isCh) { wins++; localStorage.setItem('weekWorldWins', wins); } 
+    else { medals++; localStorage.setItem('weekWorldMedals', medals); } 
+    
+    // YENİ BAŞARIM KONTROLLERİ
+    if(currentMode === 'blind_shot' && score >= 20000) unlockAchievement('blind_20k');
+    if(currentMode === 'hardcore') unlockAchievement('hard_win');
+
+    checkMilestoneAchievements();
+    document.getElementById("result").style.display = "block"; 
+    document.getElementById("result").innerHTML = `<h2 style="color:green">tebrikler!</h2><p>25.000 puan barajını geçtin!</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#2962ff; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;\">lobiye dön</button>`;
+}
 
 /* --- 3D DÜNYA --- */
 const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1000);
@@ -547,7 +729,15 @@ const light = new THREE.DirectionalLight(0xffffff, 1.3); light.position.set(5,3,
 let isDrg = false, prevM = {x:0, y:0}; document.getElementById('world-3d-container').onmousedown = () => isDrg = true;
 window.onmouseup = () => isDrg = false; window.onmousemove = (e) => { if(isDrg) { globe.rotation.y += (e.clientX - prevM.x)*0.01; globe.rotation.x += (e.clientY - prevM.y)*0.01; } prevM = {x:e.clientX, y:e.clientY}; };
 function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); } animate(); updateUI();
-setInterval(() => { totalSeconds++; localStorage.setItem('weekWorldPlaytime', totalSeconds); let d = Math.floor(totalSeconds / 86400), h = Math.floor((totalSeconds % 86400) / 3600), m = Math.floor((totalSeconds % 3600) / 60); if(document.getElementById('playtime-display')) document.getElementById('playtime-display').innerText = `${d} Gün ${h} Saat ${m} Dakika`; }, 1000);
+
+// OYUN SÜRESİ
+setInterval(() => { 
+    totalSeconds++; 
+    localStorage.setItem('weekWorldPlaytime', totalSeconds); 
+    let d = Math.floor(totalSeconds / 86400), h = Math.floor((totalSeconds % 86400) / 3600), m = Math.floor((totalSeconds % 3600) / 60); 
+    if(document.getElementById('playtime-display')) document.getElementById('playtime-display').innerText = `${d} gün ${h} saat ${m} dakika`;
+    if(totalSeconds >= 36000) unlockAchievement('loyal_10h');
+}, 1000);
 </script>
 </body>
 </html>
