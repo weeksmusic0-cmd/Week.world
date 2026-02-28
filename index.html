@@ -10,34 +10,45 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <style>
+    /* SCROLLBAR GİZLEME */
+    ::-webkit-scrollbar { display: none !important; }
+    * { -ms-overflow-style: none !important; scrollbar-width: none !important; }
+
     body{margin:0;font-family:'Segoe UI',Arial;overflow:hidden; background: #000; color: white;}
     #map{height:100vh; width:100%; cursor:crosshair; background: #222; position: absolute; top:0; left:0; z-index: 1;}
 
-    /* SES KONTROL BUTONU */
-    #music-toggle {
+    /* AYARLAR BUTONU */
+    #settings-toggle {
         position: fixed; top: 20px; left: 20px; z-index: 30005;
         background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); color: white;
         padding: 10px; border-radius: 50%; width: 50px; height: 50px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 24px; cursor: pointer; backdrop-filter: blur(5px);
-        transition: 0.3s; user-select: none;
+        font-size: 24px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s; user-select: none;
     }
-    #music-toggle:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+    #settings-toggle:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
 
     /* GEÇİŞ PERDESİ */
     #transition-curtain {
         position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%;
-        background: #000; z-index: 30000; transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        pointer-events: none;
+        background: #000; z-index: 30000; transition: bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none;
     }
     #transition-curtain.active { bottom: 0; }
 
     /* MENÜ VE EKRANLAR */
-    #main-menu, #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu {
+    #main-menu, #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu, #quest-menu, #settings-menu {
         position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #050505; z-index: 9999;
         display: flex; justify-content: space-between; align-items: center; transition: opacity 0.5s ease;
     }
-    #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu { display: none; flex-direction: column; justify-content: center; z-index: 10001; }
+    #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu, #quest-menu, #settings-menu { 
+        display: none; flex-direction: column; justify-content: center; z-index: 10001; 
+    }
+
+    /* KİTAP TEMALI AYARLAR EKRANI */
+    .book-container {
+        background: #fdf6e3; border-radius: 10px; padding: 40px; color: #333; max-width: 600px; width: 90%; 
+        position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.05);
+        display: flex; flex-direction: column; gap: 20px;
+    }
 
     /* GEÇİŞ EKRANI */
     #start-countdown-overlay {
@@ -70,7 +81,7 @@
     .market-section-title { font-size: 1.8rem; color: #ffcc00; margin: 40px 0 20px 0; border-bottom: 2px solid #333; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
     .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; margin-bottom: 50px; }
     .market-item { background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 20px; padding: 20px; transition: 0.3s; }
-    .item-img-preview { width: 80px; height: 80px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #444; object-fit: cover; }
+    .item-img-preview { width: 80px; height: 80px; border-radius: 10px; margin-bottom: 15px; border: 2px solid #444; object-fit: cover; pointer-events: none; }
     .frame-preview { border-radius: 50%; border: 4px solid; position: relative; overflow: hidden; }
     .item-name { font-weight: bold; margin-bottom: 5px; font-size: 14px; height: 40px; display: flex; align-items: center; justify-content: center; }
     .item-price { color: #ffcc00; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
@@ -103,7 +114,7 @@
     
     .mini-profile { cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
     .avatar-wrapper { width: 64px; height: 64px; position: relative; display: flex; align-items: center; justify-content: center; }
-    .avatar-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: #333; z-index: 1; }
+    .avatar-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: #333; z-index: 1; pointer-events: none; }
     .avatar-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; z-index: 2; box-sizing: border-box; }
 
     .inventory-section { background: rgba(0,0,0,0.5); border-radius: 15px; padding: 15px; margin-bottom: 20px; text-align: left; border: 1px solid #333; }
@@ -113,32 +124,14 @@
     .title-tag.active { background: #ffcc00; color: #000 !important; font-weight: bold; border-color: #ffcc00; }
     .title-tag.active span { -webkit-text-fill-color: #000 !important; }
 
-    /* MOR VE SARI TASARIM (Baş Harfler Büyük Olacak Şekilde Güncellendi) */
+    /* OYUN TASARIMI */
     .top-bar{ position:absolute;top:20px;left:0;width:100%; display:flex;justify-content:space-between;padding:0 30px;box-sizing:border-box;z-index:1000; visibility: hidden; pointer-events: none;}
-    .city-box{
-        background: #6a1b9a; padding:12px 25px; border-radius:12px; 
-        color:#ffcc00; font-size: 20px; pointer-events: auto;
-        font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize;
-    }
-    .score-box{
-        background: #6a1b9a; color:#ffcc00; padding:12px 25px; border-radius:12px; 
-        min-width:140px; text-align:center; pointer-events: auto;
-        font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize;
-    }
-    .timer-box{ 
-        position:absolute; top:20px; left:50%; transform:translateX(-50%); 
-        background: #6a1b9a; color:#ffcc00; padding:12px 30px; border-radius:20px; 
-        font-size: 22px; z-index:1000; visibility: hidden;
-        font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize;
-    }
+    .city-box{ background: #6a1b9a; padding:12px 25px; border-radius:12px; color:#ffcc00; font-size: 20px; pointer-events: auto; font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize; }
+    .score-box{ background: #6a1b9a; color:#ffcc00; padding:12px 25px; border-radius:12px; min-width:140px; text-align:center; pointer-events: auto; font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize; }
+    .timer-box{ position:absolute; top:20px; left:50%; transform:translateX(-50%); background: #6a1b9a; color:#ffcc00; padding:12px 30px; border-radius:20px; font-size: 22px; z-index:1000; visibility: hidden; font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize; }
     .distance-box{ position:absolute;top:85px;left:50%;transform:translateX(-50%); background:#2962ff;color:white;padding:10px 25px;border-radius:20px; font-weight:bold;z-index:1000;display:none; text-transform: capitalize; }
     .bottom-bar{ position:absolute;bottom:40px;left:50%;transform:translateX(-50%); z-index:1000; visibility: hidden;}
-    .guess-btn { 
-        padding:16px 60px; font-size:20px; border-radius:40px;
-        background: #6a1b9a; color:#ffcc00; cursor:pointer; border:none; 
-        opacity: 0.4; pointer-events: none; transition: 0.3s; 
-        font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize;
-    }
+    .guess-btn { padding:16px 60px; font-size:20px; border-radius:40px; background: #6a1b9a; color:#ffcc00; cursor:pointer; border:none; opacity: 0.4; pointer-events: none; transition: 0.3s; font-family: 'Arial Black', 'Gadget', sans-serif; text-transform: capitalize; }
     .guess-btn.active { opacity: 1; pointer-events: auto; }
 
     .result-box{ position:fixed;top:50%;left:50%;transform:translate(-50%,-50%); background:white;padding:40px;border-radius:24px; z-index:10001; display:none; text-align:center; color: black; }
@@ -147,12 +140,11 @@
     .tick { flex: 1; background: rgba(255,255,255,0.1); border-radius: 2px; }
     .tick.active { background: #ffcc00; }
 
-    /* BAŞARIM BİLDİRİM EKRANI */
+    /* BAŞARIM VE GÖREV BİLDİRİM EKRANI */
     #achv-notification {
         position: fixed; bottom: 40px; right: -400px;
         background: #6a1b9a; color: white; padding: 20px 30px; border-radius: 15px; display: flex; align-items: center; gap: 15px;
-        box-shadow: 0 0 20px rgba(106, 27, 154, 0.8); z-index: 99999;
-        transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 0 20px rgba(106, 27, 154, 0.8); z-index: 99999; transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .achv-notif-text-container { display: flex; flex-direction: column; position: relative; }
     #achv-medal-badge {
@@ -161,16 +153,38 @@
     }
 
     /* ÖZEL ÇERÇEVELER */
-    .fire-frame { border: 4px solid transparent !important;
-        background-image: linear-gradient(#000, #000), linear-gradient(to right, orange, red, yellow); background-origin: border-box; background-clip: content-box, border-box; animation: rotateGradient 2s linear infinite;
-    }
+    .fire-frame { border: 4px solid transparent !important; background-image: linear-gradient(#000, #000), linear-gradient(to right, orange, red, yellow); background-origin: border-box; background-clip: content-box, border-box; animation: rotateGradient 2s linear infinite; }
     @keyframes rotateGradient { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+
+    /* GÖREVLER MENÜSÜ CSS */
+    .quest-container { display: flex; width: 90%; max-width: 1200px; height: 75vh; gap: 30px; }
+    .quest-column { flex: 1; background: rgba(20, 25, 35, 0.9); border: 1px solid #333; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; }
+    .quest-column-header { text-align: center; font-size: 2rem; font-weight: bold; color: #ffcc00; margin-bottom: 5px; }
+    .quest-timer { text-align: center; color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
+    .quest-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-right: 10px; }
+    .quest-item { background: rgba(0, 0, 0, 0.5); border: 1px solid #444; border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; position: relative; transition: 0.3s; }
+    .quest-item:hover { border-color: #6a1b9a; background: rgba(106, 27, 154, 0.1); }
+    .quest-emoji { font-size: 2.5rem; }
+    .quest-details { flex: 1; }
+    .quest-title { font-size: 1.2rem; font-weight: bold; color: white; margin-bottom: 5px; }
+    .quest-desc { font-size: 0.85rem; color: #ccc; margin-bottom: 10px; }
+    .quest-progress-bar-bg { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; }
+    .quest-progress-bar-fill { height: 100%; background: #2962ff; transition: width 0.3s ease; }
+    .quest-reward { position: absolute; top: 15px; right: 15px; font-weight: bold; color: #ffcc00; font-size: 0.9rem; }
+    .quest-claim-btn { position: absolute; bottom: 15px; right: 15px; background: #00c853; color: white; border: none; padding: 6px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; display: none; transition: 0.2s; }
+    .quest-claim-btn:hover { background: #00e676; transform: scale(1.05); }
+    .quest-item.completed .quest-progress-bar-fill { background: #00c853; }
+    .quest-item.claimed { opacity: 0.5; pointer-events: none; border-color: #222; }
+    .quest-item.claimed .quest-claim-btn { display: block; background: #444; color: #888; text-transform: uppercase; cursor: default; }
+
+    /* Butonları yan yana koymak için flex kapsayıcı */
+    .bottom-buttons-container { position: absolute; bottom: 30px; right: 30px; z-index: 10000; display: flex; gap: 20px; }
 </style>
 </head>
 <body onclick="initFirstAudio()">
 
 <div id="transition-curtain"></div>
-<div id="music-toggle" onclick="toggleGlobalMusic(event)">🔊</div>
+<div id="settings-toggle" onclick="openSettings(event)" title="Ayarları açmak için tıklayın">📖</div>
 
 <div id="score-animation-overlay">
     <div class="score-anim-container">
@@ -188,8 +202,29 @@
     <span id="achv-notif-emoji" style="font-size: 35px;">🏅</span>
     <div class="achv-notif-text-container">
         <div id="achv-medal-badge">+1 🏆</div>
-        <span style="font-size: 13px; font-weight: bold; color: #e1bee7; margin-bottom: 3px;">BAŞARIM KAZANILDI</span>
+        <span id="achv-notif-type" style="font-size: 13px; font-weight: bold; color: #e1bee7; margin-bottom: 3px;">BAŞARIM KAZANILDI</span>
         <span id="achv-notif-title" style="font-size: 18px; font-weight: 900; opacity: 0; transition: opacity 1s ease-in;">Şampiyon</span>
+    </div>
+</div>
+
+<div id="settings-menu">
+    <div class="book-container">
+        <h2 style="color: #6a1b9a; text-align: center; margin-top: 0; font-family: 'Georgia', serif; font-size: 2rem;">Ayarlar & İstatistikler</h2>
+        
+        <div style="text-align: center; margin: 10px 0;">
+            <button id="in-menu-music-toggle" onclick="toggleGlobalMusic(event)" style="padding: 12px 25px; font-size: 16px; border-radius: 8px; cursor:pointer; background: #6a1b9a; color: #ffcc00; border: none; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">🔊 Sesi Kapat</button>
+        </div>
+        
+        <div style="font-size: 18px; line-height: 2; font-weight: bold; font-family: 'Courier New', monospace; padding: 20px; background: rgba(0,0,0,0.05); border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 5px;"><span>Oynanan oyunlar:</span> <span id="stat-played">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-top: 10px;"><span>Kazanılan oyunlar:</span> <span id="stat-won">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-top: 10px;"><span>Kaybedilen oyunlar:</span> <span id="stat-lost">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-top: 10px;"><span>Tamamlanan meydan okumalar:</span> <span id="stat-challenges">0</span></div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 5px; margin-top: 10px;"><span>Kazanılan madalya:</span> <span id="stat-earned-medals">0</span></div>
+            <div style="display: flex; justify-content: space-between; margin-top: 10px;"><span>Harcanan madalya:</span> <span id="stat-spent-medals">0</span></div>
+        </div>
+        
+        <button onclick="closeSettings()" style="margin-top: 20px; width: 100%; padding: 15px; background: #222; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px;">Kapat</button>
     </div>
 </div>
 
@@ -219,21 +254,43 @@
         <button class="buy-btn" style="height:50px; font-size:16px; background: linear-gradient(45deg, #6200ea, #2962ff);" onclick="openMarket()">🛒 MARKET</button>
     </div>
 
-    <div class="mode-card" style="position: absolute; bottom: 30px; right: 30px; z-index: 10000; width: 260px;" onclick="openAchievements()">
-        <span class="mode-title">🏅 BAŞARIMLAR</span>
-        <span class="mode-desc">Başarımları Görüntüle</span>
+    <div class="bottom-buttons-container">
+        <div class="mode-card" style="width: 260px;" onclick="openAchievements()">
+            <span class="mode-title">🏅 BAŞARIMLAR</span>
+            <span class="mode-desc">Başarımları Görüntüle</span>
+        </div>
+        <div class="mode-card" style="width: 260px;" onclick="openQuests()">
+            <span class="mode-title">📜 GÖREVLER</span>
+            <span class="mode-desc">Görevlerini görmek için tıkla.</span>
+        </div>
     </div>
 </div>
 
 <div id="achievement-menu">
     <h2 id="achv-header" style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-bottom: 40px; margin-top: 50px;">Sahip olunan başarımlar: 0</h2>
-    <div id="achv-grid" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 900px; padding: 20px; overflow-y: auto;"></div>
+    <div id="achv-grid" class="drag-area" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 900px; padding: 20px; overflow-y: auto;"></div>
     <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeAchievements()">← GERİ DÖN</button>
+</div>
+
+<div id="quest-menu">
+    <div class="quest-container">
+        <div class="quest-column">
+            <div class="quest-column-header">Günlük Görevler</div>
+            <div class="quest-timer" id="daily-timer">Yenilenmeye Kalan Süre: --:--:--</div>
+            <div class="quest-list drag-area" id="daily-quest-list"></div>
+        </div>
+        <div class="quest-column">
+            <div class="quest-column-header">Haftalık Görevler</div>
+            <div class="quest-timer" id="weekly-timer">Yenilenmeye Kalan Süre: -- Gün --:--:--</div>
+            <div class="quest-list drag-area" id="weekly-quest-list"></div>
+        </div>
+    </div>
+    <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeQuests()">← GERİ DÖN</button>
 </div>
 
 <div id="market-menu">
     <div class="market-header">🏆 <span id="market-medal-count">0</span></div>
-    <div class="market-container">
+    <div class="market-container drag-area">
         <h2 class="market-section-title">🖼️ Profil Fotoğrafları</h2>
         <div class="market-grid" id="market-grid-photos"></div>
         <h2 class="market-section-title">✨ Avatar Çerçeveleri</h2>
@@ -256,7 +313,7 @@
     <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeChallenges()">← GERİ</button>
 </div>
 
-<div id="profile-edit-menu" style="background: rgba(15, 15, 20, 0.95); border: 1px solid #333; width: 700px; padding: 40px; border-radius: 20px; text-align: center; margin: auto; max-height: 80vh; overflow-y: auto;">
+<div id="profile-edit-menu" class="drag-area" style="background: rgba(15, 15, 20, 0.95); border: 1px solid #333; width: 700px; padding: 40px; border-radius: 20px; text-align: center; margin: auto; max-height: 80vh; overflow-y: auto;">
     <h2 style="margin-top: 0; color: #ffcc00;">Profil ve Envanter</h2>
     <div style="margin-bottom: 30px;"><div class="inventory-title">KULLANICI ADI</div><input type="text" id="name-input" placeholder="İsim Değiştir" style="padding:15px; border-radius:10px; border: 1px solid #444; background: rgba(0,0,0,0.5); color: white; width:80%; font-size: 16px; text-align: center;"></div>
     <div class="inventory-section"><div class="inventory-title">SAHİP OLUNAN ÜNVANLAR</div><div class="inventory-grid" id="inv-titles" style="justify-content: center;"></div></div>
@@ -284,8 +341,6 @@ let wins = parseInt(localStorage.getItem('weekWorldWins')) || 0;
 let medals = parseInt(localStorage.getItem('weekWorldMedals')) || 0;
 let totalSeconds = parseInt(localStorage.getItem('weekWorldPlaytime')) || 0;
 let profileData = JSON.parse(localStorage.getItem('weekWorldProfile')) || { name: "Oyuncu", title: "YENİ OYUNCU", avatar: "https://i.ibb.co/vz6mXmX/default-avatar.png", frame: "", ownedAvatars: ["https://i.ibb.co/vz6mXmX/default-avatar.png"], ownedFrames: [], ownedTitles: ["YENİ OYUNCU", "GEZGİN"] };
-
-// Geriye dönük uyumluluk (Eski kayıtlarda harita bölümü yoksa ekle)
 if (!profileData.ownedMapStyles) profileData.ownedMapStyles = ["Varsayılan"];
 if (!profileData.mapStyle) profileData.mapStyle = "Varsayılan";
 
@@ -293,6 +348,26 @@ if (!profileData.mapStyle) profileData.mapStyle = "Varsayılan";
 let unlockedAchievements = JSON.parse(localStorage.getItem('weekWorldAchievements')) || [];
 let spentMedals = parseInt(localStorage.getItem('weekWorldSpentMedals')) || 0;
 let streak4500 = parseInt(localStorage.getItem('weekWorldStreak4500')) || 0;
+
+/* --- YENİ İSTATİSTİK TAKİBİ --- */
+let gamesPlayed = parseInt(localStorage.getItem('weekWorldGamesPlayed')) || 0;
+let totalMedalsEarned = parseInt(localStorage.getItem('weekWorldTotalMedalsEarned')) || medals;
+let gamesLost = parseInt(localStorage.getItem('weekWorldGamesLost')) || 0;
+let challengesCompleted = parseInt(localStorage.getItem('weekWorldChallengesCompleted')) || 0;
+
+function saveStats() {
+    localStorage.setItem('weekWorldGamesPlayed', gamesPlayed);
+    localStorage.setItem('weekWorldTotalMedalsEarned', totalMedalsEarned);
+    localStorage.setItem('weekWorldGamesLost', gamesLost);
+    localStorage.setItem('weekWorldChallengesCompleted', challengesCompleted);
+}
+
+function addMedals(amount) {
+    medals += amount;
+    totalMedalsEarned += amount;
+    localStorage.setItem('weekWorldMedals', medals);
+    saveStats();
+}
 
 const achievementsData = [
     { id: 'guess_5k', title: '5.000 Puan', desc: 'Harita üzerinde 5.000 puanlık tahmin yap', emoji: '🎯', reward: 3 },
@@ -322,8 +397,8 @@ function initFirstAudio() {
 }
 
 function updateMuteUI() {
-    const btn = document.getElementById('music-toggle');
-    if(btn) btn.innerText = isMusicMuted ? '🔇' : '🔊';
+    const btn = document.getElementById('in-menu-music-toggle');
+    if(btn) btn.innerText = isMusicMuted ? '🔇 Sesi Aç' : '🔊 Sesi Kapat';
 }
 
 function toggleGlobalMusic(event) {
@@ -389,15 +464,41 @@ function startGameMusic() {
     }, 250);
 }
 
-function playBinocularSound() {
+/* YENİ: SAYFA ÇEVİRME SESİ */
+function playPageTurnSound() {
     if (isMusicMuted || !audioCtx) return;
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    osc.type = 'square'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
-    g.gain.setValueAtTime(0.08, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    osc.connect(g);
-    g.connect(audioCtx.destination); osc.start(); osc.stop(now + 0.15);
+    const duration = 0.35;
+    const bufferSize = audioCtx.sampleRate * duration;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+    const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter(); 
+    filter.type = 'lowpass'; filter.frequency.setValueAtTime(800, audioCtx.currentTime); 
+    filter.frequency.linearRampToValueAtTime(2000, audioCtx.currentTime + duration);
+    const gain = audioCtx.createGain(); 
+    gain.gain.setValueAtTime(0.5, audioCtx.currentTime); 
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+    noise.start();
+}
+
+/* YENİ: KAĞIT SESİ (Dürbün sesi yerine) */
+function playPaperSound() {
+    if (isMusicMuted || !audioCtx) return;
+    const duration = 0.2;
+    const bufferSize = audioCtx.sampleRate * duration;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+    const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+    const filter = audioCtx.createBiquadFilter(); 
+    filter.type = 'highpass'; filter.frequency.value = 2000;
+    const gain = audioCtx.createGain(); 
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime); 
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+    noise.start();
 }
 
 function playWindSound(duration) {
@@ -436,6 +537,25 @@ function playScoreTick() {
     osc.stop(audioCtx.currentTime + 0.1);
 }
 
+/* --- AYARLAR VE İSTATİSTİKLER --- */
+function openSettings(event) {
+    if(event) event.stopPropagation();
+    playPageTurnSound();
+    document.getElementById('settings-menu').style.display = 'flex';
+    document.getElementById('stat-played').innerText = gamesPlayed;
+    document.getElementById('stat-won').innerText = wins;
+    document.getElementById('stat-lost').innerText = gamesLost;
+    document.getElementById('stat-challenges').innerText = challengesCompleted;
+    document.getElementById('stat-earned-medals').innerText = totalMedalsEarned;
+    document.getElementById('stat-spent-medals').innerText = spentMedals;
+}
+
+function closeSettings() {
+    playPageTurnSound();
+    document.getElementById('settings-menu').style.display = 'none';
+}
+
+
 /* --- PUAN ANİMASYONU --- */
 function animateScoreWithOverlay(roundScore) {
     const overlay = document.getElementById('score-animation-overlay');
@@ -457,18 +577,22 @@ function animateScoreWithOverlay(roundScore) {
             const steps = 30;
             const inc = roundScore / steps;
             let step = 0;
+      
             const int = setInterval(() => {
                 step++;
                 current = Math.floor(oldTotal + (inc * step));
                 if(step >= steps) {
                     current = targetTotal;
+          
                     clearInterval(int);
                     setTimeout(() => {
                         addedScoreTxt.classList.remove('active');
                         setTimeout(() => {
+                  
                             mainScoreTxt.classList.remove('active');
                             setTimeout(() => {
                                 overlay.style.display = 'none';
+                          
                                 startMola();
                             }, 500);
                         }, 1500);
@@ -490,26 +614,34 @@ function renderAchievements() {
     const grid = document.getElementById('achv-grid'); grid.innerHTML = '';
     achievementsData.forEach(achv => {
         let isUnlocked = unlockedAchievements.includes(achv.id);
-        let card = document.createElement('div'); card.className = 'mode-card achv-card'; card.style.opacity = isUnlocked ? '1' : '0.5';
+        let card = document.createElement('div'); card.className = 'mode-card achv-card drag-area'; card.style.opacity = isUnlocked ? '1' : '0.5';
         card.innerHTML = `<span class="achv-title">${achv.emoji} ${achv.title}</span><span class="mode-desc">${achv.desc}</span>`;
         grid.appendChild(card);
     });
+    enableDragScroll('.drag-area');
 }
 
 let notifQueue = [];
 let isNotifPlaying = false;
-function showAchvNotification(achv) { notifQueue.push(achv); if (!isNotifPlaying) playNextNotif(); }
+function showAchvNotification(achv, isQuest = false) { 
+    notifQueue.push({achv, isQuest}); 
+    if (!isNotifPlaying) playNextNotif();
+}
 function playNextNotif() {
     if (notifQueue.length === 0) { isNotifPlaying = false; return; }
     isNotifPlaying = true;
-    let achv = notifQueue.shift();
+    let data = notifQueue.shift();
+    let achv = data.achv;
     let notifEl = document.getElementById('achv-notification');
     let titleEl = document.getElementById('achv-notif-title');
+    let typeEl = document.getElementById('achv-notif-type');
     let medalBadge = document.getElementById('achv-medal-badge');
 
-    document.getElementById('achv-notif-emoji').innerText = achv.emoji;
+    typeEl.innerText = data.isQuest ? "GÖREV TAMAMLANDI" : "BAŞARIM KAZANILDI";
+    document.getElementById('achv-notif-emoji').innerText = achv.emoji || '📜';
     titleEl.innerText = achv.title;
     titleEl.style.opacity = "0";
+
     if(achv.reward && achv.reward > 0) {
         medalBadge.innerText = `+${achv.reward} 🏆`;
         medalBadge.style.display = 'block';
@@ -534,12 +666,12 @@ function unlockAchievement(id) {
         let achv = achievementsData.find(a => a.id === id);
         
         if(achv && achv.reward > 0) {
-            medals += achv.reward;
-            localStorage.setItem('weekWorldMedals', medals);
+            triggerQuest('d5', achv.reward); triggerQuest('w10', achv.reward);
+            addMedals(achv.reward);
             updateUI();
         }
 
-        showAchvNotification(achv);
+        showAchvNotification(achv, false);
         if(document.getElementById('achievement-menu').style.display === 'flex') renderAchievements();
     }
 }
@@ -560,14 +692,35 @@ const coloredProducts = [
     { id: 'p_red', type: 'photo', name: 'Kırmızı Profil Fotoğrafı', price: 8, url: createSVG('ff3d00', 'Kırmızı') },
     { id: 'p_world', type: 'photo', name: 'Dünya', price: 12, url: createSpecialSVG('black', '🌍') },
     { id: 'p_fire', type: 'photo', name: 'Ateş', price: 12, url: createSpecialSVG('orange', '🔥') },
+    /* YENİ 5 ADET FOTOĞRAF (Fiyatları 10) */
+    { id: 'p_alien', type: 'photo', name: 'Uzaylı', price: 10, url: createSpecialSVG('#111', '👽') },
+    { id: 'p_cat', type: 'photo', name: 'Kedicik', price: 10, url: createSpecialSVG('#ff9800', '🐱') },
+    { id: 'p_dog', type: 'photo', name: 'Köpekcik', price: 10, url: createSpecialSVG('#8d6e63', '🐶') },
+    { id: 'p_fox', type: 'photo', name: 'Kurnaz Tilki', price: 10, url: createSpecialSVG('#ff5722', '🦊') },
+    { id: 'p_ghost', type: 'photo', name: 'Hayalet', price: 10, url: createSpecialSVG('#9e9e9e', '👻') },
+
     { id: 'f_fire', type: 'frame', name: 'Alev Çerçevesi', price: 12, color: 'fire_gradient' },
     { id: 'f_blue', type: 'frame', name: 'Mavi Avatar Çerçevesi', price: 10, color: '#2962ff' },
     { id: 'f_green', type: 'frame', name: 'Yeşil Avatar Çerçevesi', price: 10, color: '#00c853' },
     { id: 'f_red', type: 'frame', name: 'Kırmızı Avatar Çerçevesi', price: 10, color: '#ff3d00' },
+    /* YENİ 5 ADET ÇERÇEVE (Fiyatları 10) */
+    { id: 'f_purple', type: 'frame', name: 'Mor Avatar Çerçevesi', price: 10, color: '#9c27b0' },
+    { id: 'f_gold', type: 'frame', name: 'Altın Avatar Çerçevesi', price: 10, color: '#ffd700' },
+    { id: 'f_cyan', type: 'frame', name: 'Turkuaz Avatar Çerçevesi', price: 10, color: '#00bcd4' },
+    { id: 'f_pink', type: 'frame', name: 'Pembe Avatar Çerçevesi', price: 10, color: '#e91e63' },
+    { id: 'f_white', type: 'frame', name: 'Beyaz Avatar Çerçevesi', price: 10, color: '#ffffff' },
+
     { id: 't_rich', type: 'title', name: 'Zengin Oyuncu', price: 15, titleColor: '#ccff00' },
     { id: 't_first', type: 'title', name: 'Birinci', price: 8, titleColor: '#00ffff' },
     { id: 't_worldtour', type: 'title', name: 'Dünya Turu', price: 20, isGradient: true, gradient: 'linear-gradient(to right, #2962ff, #00c853)' },
     { id: 't_serialmapper', type: 'title', name: 'Seri Haritacı', price: 18, isGradient: true, gradient: 'linear-gradient(to right, #ff3d00, #8b0000)' },
+    /* YENİ 5 ADET ÜNVAN (Fiyatları 10) */
+    { id: 't_legend', type: 'title', name: 'Efsane', price: 10, titleColor: '#ff9800' },
+    { id: 't_explorer', type: 'title', name: 'Kaşif', price: 10, titleColor: '#4caf50' },
+    { id: 't_tourist', type: 'title', name: 'Turist', price: 10, titleColor: '#03a9f4' },
+    { id: 't_expert', type: 'title', name: 'Uzman', price: 10, titleColor: '#9c27b0' },
+    { id: 't_mapworm', type: 'title', name: 'Harita Kurdu', price: 10, titleColor: '#795548' },
+
     { id: 'm_dark', type: 'mapStyle', name: 'Karanlık Harita', price: 30, url: createSpecialSVG('#111', '🌑') }
 ];
 
@@ -576,7 +729,7 @@ function initMarket() {
     Object.values(grids).forEach(g => g.innerHTML = '');
     coloredProducts.forEach(p => {
         let isOwned = (p.type === 'photo' ? profileData.ownedAvatars.includes(p.url) : p.type === 'frame' ? profileData.ownedFrames.includes(p.color) : p.type === 'mapStyle' ? profileData.ownedMapStyles.includes(p.name) : profileData.ownedTitles.includes(p.name));
-        const div = document.createElement('div'); div.className = 'market-item'; let preview = "";
+        const div = document.createElement('div'); div.className = 'market-item drag-area'; let preview = "";
         
         if(p.type === 'frame') preview = `<div class="item-img-preview frame-preview ${p.color === 'fire_gradient' ? 'fire-frame' : ''}" style="${p.color !== 'fire_gradient' ? 'border-color:'+p.color : ''}; margin:auto;"></div>`;
         else if(p.type === 'photo' || p.type === 'mapStyle') preview = `<img src="${p.url}" class="item-img-preview" style="margin:auto;">`;
@@ -588,16 +741,22 @@ function initMarket() {
         div.innerHTML = `${preview}<div class="item-name">${p.type === 'title' ? '' : p.name}</div><div class="item-price">🏆 ${p.price}</div><button class="buy-btn ${isOwned ? 'owned' : ''}" onclick="buyProduct('${p.id}')">${isOwned ? 'SAHİPSİN' : 'SATIN AL'}</button>`;
         grids[p.type].appendChild(div);
     });
+    enableDragScroll('.drag-area');
 }
 
 function buyProduct(id) {
     const p = coloredProducts.find(x => x.id === id); if(!p || medals < p.price) return;
     medals -= p.price; 
-    
-    // Başarım Kontrolü: Zengin
     spentMedals += p.price;
     localStorage.setItem('weekWorldSpentMedals', spentMedals);
+    
+    // Başarım ve Görev Kancası
     if (spentMedals >= 50) unlockAchievement('rich');
+    triggerQuest('d6'); triggerQuest('d17'); // Alışveriş Vakti!
+    triggerQuest('w12', p.price); triggerQuest('w18'); // Para Babası
+    if(p.type === 'title') {
+        let qs = loadQuestState(); qs.w5BoughtTitle = true; saveQuestState(qs);
+    }
     
     if(p.type === 'photo') profileData.ownedAvatars.push(p.url); 
     else if(p.type === 'frame') profileData.ownedFrames.push(p.color); 
@@ -605,28 +764,33 @@ function buyProduct(id) {
     else profileData.ownedTitles.push(p.name);
     
     localStorage.setItem('weekWorldMedals', medals); 
-    saveProfile(); updateUI(); renderInventory(); initMarket();
+    saveStats(); saveProfile(); updateUI(); renderInventory(); initMarket();
 }
 
 function renderInventory() {
-    const grids = { av: document.getElementById('inv-avatars'), fr: document.getElementById('inv-frames'), ti: document.getElementById('inv-titles'), mp: document.getElementById('inv-maps') }; Object.values(grids).forEach(g => g.innerHTML = '');
+    const grids = { av: document.getElementById('inv-avatars'), fr: document.getElementById('inv-frames'), ti: document.getElementById('inv-titles'), mp: document.getElementById('inv-maps') };
+    Object.values(grids).forEach(g => g.innerHTML = '');
     
     profileData.ownedTitles.forEach(t => { 
         const span = document.createElement('div'); span.className = `title-tag ${profileData.title === t ? 'active' : ''}`; 
         let prod = coloredProducts.find(x => x.name === t);
         if (prod && prod.isGradient) span.innerHTML = `<span style="background: ${prod.gradient}; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${t}</span>`;
         else span.innerText = t; 
-        span.onclick = () => { profileData.title = t; renderInventory(); updateUI(); }; grids.ti.appendChild(span); 
+        span.onclick = () => { profileData.title = t; checkTitleEquip(); renderInventory(); updateUI(); }; grids.ti.appendChild(span); 
     });
     
     profileData.ownedMapStyles.forEach(m => { 
         const span = document.createElement('div'); span.className = `title-tag ${profileData.mapStyle === m ? 'active' : ''}`; span.innerText = m; 
         span.onclick = () => { profileData.mapStyle = m; renderInventory(); updateUI(); }; grids.mp.appendChild(span); 
     });
+    profileData.ownedAvatars.forEach(url => { let img = document.createElement('img'); img.src = url; img.className = 'inv-item'; img.style.cssText = `width:60px; height:60px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.avatar === url ? '#ffcc00' : 'transparent'}; pointer-events: auto;`; img.onclick = () => { profileData.avatar = url; updateUI(); renderInventory(); }; grids.av.appendChild(img); });
+    let noFr = document.createElement('div'); noFr.className = 'inv-item'; noFr.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.frame === '' ? '#ffcc00' : '#444'}; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); pointer-events: auto;`; noFr.innerHTML = '❌'; noFr.onclick = () => { profileData.frame = ''; updateUI(); renderInventory(); }; grids.fr.appendChild(noFr);
+    profileData.ownedFrames.forEach(c => { let div = document.createElement('div'); div.className = 'inv-item ' + (c === 'fire_gradient' ? 'fire-frame' : ''); div.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; ${c === 'fire_gradient' ? '' : 'border:4px solid '+c}; box-shadow: ${profileData.frame === c ? '0 0 15px orange' : 'none'}; pointer-events: auto;`; div.onclick = () => { profileData.frame = c; updateUI(); renderInventory(); }; grids.fr.appendChild(div); });
+}
 
-    profileData.ownedAvatars.forEach(url => { let img = document.createElement('img'); img.src = url; img.className = 'inv-item'; img.style.cssText = `width:60px; height:60px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.avatar === url ? '#ffcc00' : 'transparent'};`; img.onclick = () => { profileData.avatar = url; updateUI(); renderInventory(); }; grids.av.appendChild(img); });
-    let noFr = document.createElement('div'); noFr.className = 'inv-item'; noFr.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; border: 3px solid ${profileData.frame === '' ? '#ffcc00' : '#444'}; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5);`; noFr.innerHTML = '❌'; noFr.onclick = () => { profileData.frame = ''; updateUI(); renderInventory(); }; grids.fr.appendChild(noFr);
-    profileData.ownedFrames.forEach(c => { let div = document.createElement('div'); div.className = 'inv-item ' + (c === 'fire_gradient' ? 'fire-frame' : ''); div.style.cssText = `width:54px; height:54px; border-radius:50%; cursor:pointer; ${c === 'fire_gradient' ? '' : 'border:4px solid '+c}; box-shadow: ${profileData.frame === c ? '0 0 15px orange' : 'none'};`; div.onclick = () => { profileData.frame = c; updateUI(); renderInventory(); }; grids.fr.appendChild(div); });
+function checkTitleEquip() {
+    let qs = loadQuestState();
+    if(qs.w5BoughtTitle && profileData.title !== 'YENİ OYUNCU' && profileData.title !== 'GEZGİN') { triggerQuest('w5'); }
 }
 
 function updateUI() {
@@ -651,7 +815,8 @@ function updateUI() {
     document.getElementById('name-input').value = profileData.name;
     let emoji = wins < 20 ? "⛓️" : wins < 40 ? "🥈" : wins < 60 ? "🥇" : "💎"; document.getElementById('rank-emoji').innerText = emoji;
     document.getElementById('rank-name').innerText = wins < 20 ? "Demir" : wins < 40 ? "Gümüş" : wins < 60 ? "Altın" : "Elmas";
-    const ticks = document.getElementById('win-ticks'); ticks.innerHTML = ''; for(let i=0; i<20; i++) { let t = document.createElement('div'); t.className = 'tick' + (i < (wins % 20) ? ' active' : ''); ticks.appendChild(t); }
+    const ticks = document.getElementById('win-ticks'); ticks.innerHTML = '';
+    for(let i=0; i<20; i++) { let t = document.createElement('div'); t.className = 'tick' + (i < (wins % 20) ? ' active' : ''); ticks.appendChild(t); }
 }
 
 function saveProfile() { localStorage.setItem('weekWorldProfile', JSON.stringify(profileData)); }
@@ -660,7 +825,263 @@ function closeMarket() { document.getElementById('market-menu').style.display = 
 function openChallenges() { document.getElementById('challenge-menu').style.display = 'flex'; updateUI(); }
 function closeChallenges() { document.getElementById('challenge-menu').style.display = 'none'; }
 function openProfileEdit() { document.getElementById('profile-edit-menu').style.display = 'flex'; renderInventory(); }
-function closeProfileEdit() { profileData.name = document.getElementById('name-input').value || profileData.name; saveProfile(); updateUI(); document.getElementById('profile-edit-menu').style.display = 'none'; }
+function closeProfileEdit() { 
+    let newName = document.getElementById('name-input').value;
+    if(newName !== profileData.name) { triggerQuest('d12'); triggerQuest('w24'); }
+    else { triggerQuest('d12'); } 
+    
+    profileData.name = newName || profileData.name; 
+    saveProfile(); updateUI(); document.getElementById('profile-edit-menu').style.display = 'none';
+}
+
+/* --- GÖREV SİSTEMİ (GENİŞLETİLMİŞ) --- */
+const ALL_DAILY_QUESTS = [
+    { id: 'd1', title: '3 Maç Kazan', desc: 'Herhangi bir oyun modunda 3 kez galibiyet elde et.', emoji: '🏅', reward: 2, target: 3 },
+    { id: 'd2', title: '5.000 Puan', desc: 'Herhangi bir oyun modunda 5.000 puanlık bir tahmin yap.', emoji: '🎯', reward: 2, target: 1 },
+    { id: 'd3', title: 'Avrupa Kaçkını', desc: 'Avrupa kıtasından herhangi bir şehir tahmininden minimum 4500 puan kazan.', emoji: '🇪🇺', reward: 2, target: 1 },
+    { id: 'd4', title: 'Günün 24\'te Biri', desc: 'Oyunu bir saat boyunca oyna.', emoji: '⏱️', reward: 2, target: 3600 },
+    { id: 'd5', title: 'Pazarcı', desc: 'Herhangi bir yerden 10 madalya kazan.', emoji: '🛍️', reward: 2, target: 10 },
+    { id: 'd6', title: 'Alıcıyım!', desc: 'Marketten en az 2 ürün al.', emoji: '🛒', reward: 2, target: 2 },
+    { id: 'd7', title: 'Kiraz Çiçekleri', desc: 'Japonya ülkesinden bir tahmin yaparak en az 4000 puan kazan.', emoji: '🌸', reward: 2, target: 1 },
+    { id: 'd8', title: 'Ürkütücü!', desc: 'Kör atış meydan okumasında üst üste 3 tahminden en az 3000 puan topla.', emoji: '👻', reward: 2, target: 3 },
+    { id: 'd9', title: 'Yeni Nesil!', desc: 'Her oyun modundan ve meydan okumadan en az 1 galibiyet al.', emoji: '🌟', reward: 2, target: 5 },
+    { id: 'd10', title: 'Orman Kokusu Gelmedi mi?', desc: 'Güney amerika kıtasından bir tahminde en az 4500 puan topla.', emoji: '🌳', reward: 2, target: 1 },
+    { id: 'd11', title: 'Psikolojisi Bozuk!', desc: 'Beş tane meydan okuma tamamla.', emoji: '🤪', reward: 2, target: 5 },
+    { id: 'd12', title: 'Daha mı İyi Oldu Sanki?', desc: 'Profilinden bir şeyi değiştir. (örn: profil fotoğrafı, çerçeve vs)', emoji: '🎭', reward: 2, target: 1 },
+    /* YENİ 10 GÜNLÜK GÖREV */
+    { id: 'd13', title: 'İlk Adım', desc: '1 Maç oyna.', emoji: '🚶', reward: 2, target: 1 },
+    { id: 'd14', title: 'Uzman Atışı', desc: 'Tek seferde 3000 puanlık tahmin yap.', emoji: '🎯', reward: 2, target: 1 },
+    { id: 'd15', title: 'Asya Esintisi', desc: 'Asya kıtasından bir şehri bil.', emoji: '🌏', reward: 2, target: 1 },
+    { id: 'd16', title: 'Amerika Yolcusu', desc: 'Kuzey Amerika kıtasından bir şehri bil.', emoji: '🌎', reward: 2, target: 1 },
+    { id: 'd17', title: 'Alışveriş Vakti', desc: 'Marketten 1 ürün al.', emoji: '🛒', reward: 2, target: 1 },
+    { id: 'd18', title: 'Seri Atış', desc: 'Ardışık 2 tahminden en az 4000 puan al.', emoji: '🔥', reward: 2, target: 2 },
+    { id: 'd19', title: 'Klasikçi', desc: 'Dünya modunda 1 maç oyna.', emoji: '🌍', reward: 2, target: 1 },
+    { id: 'd20', title: 'Hızlı ve Öfkeli', desc: 'Süreli modda 1 maç oyna.', emoji: '⏱️', reward: 2, target: 1 },
+    { id: 'd21', title: 'Avcı', desc: 'Zor modda 1 maç kazan.', emoji: '🧭', reward: 2, target: 1 },
+    { id: 'd22', title: 'Gözlemci', desc: 'Kör Atışta 1 tahmin yap.', emoji: '🌑', reward: 2, target: 1 }
+];
+
+const ALL_WEEKLY_QUESTS = [
+    { id: 'w1', title: 'Zor Mod Şampiyonu!', desc: 'Zor modda 10 galibiyet al.', emoji: '☠️', reward: 5, target: 10 },
+    { id: 'w2', title: 'Zamanla Yarış', desc: 'Süreli modda 30 tane minimum 4.500 puanlık tahmin yap.', emoji: '🏎️', reward: 5, target: 30 },
+    { id: 'w3', title: 'Kör Noktlar...', desc: 'Kör atış meydan okumasında 10 maç bitir (Kazan).', emoji: '🕶️', reward: 5, target: 10 },
+    { id: 'w4', title: 'Maratoncu', desc: 'Toplam süre meydan okumasında süre 01:00 dakikanın üzerindeyken 10 galibiyet al.', emoji: '🏃', reward: 5, target: 10 },
+    { id: 'w5', title: 'Koleksiyoncu', desc: 'Markette satılan ünvanlardan rastgele birini satın al ve profilinde kullan.', emoji: '🏷️', reward: 5, target: 1 },
+    { id: 'w6', title: 'Stil Sahibi.', desc: 'Envanterinden farklı bir "Harita Stili" seçerek bir oyun tamamla.', emoji: '🗺️', reward: 5, target: 1 },
+    { id: 'w7', title: 'Seviyorum Bu Oyunu!', desc: 'Beş saat boyunca oyna.', emoji: '❤️', reward: 5, target: 18000 },
+    { id: 'w8', title: 'İsabet Canavarı!', desc: '25 Tane en az 4500 puanlık tahmin yap.', emoji: '🏹', reward: 5, target: 25 },
+    { id: 'w9', title: 'Kıta Gezgini.', desc: 'Her kıtadan en az 5 kere minimum 4500 puanlık bir tahmin yap', emoji: '✈️', reward: 5, target: 6 },
+    { id: 'w10', title: 'Madalya Avcısı.', desc: '30 Madalya topla.', emoji: '🥇', reward: 5, target: 30 },
+    { id: 'w11', title: 'Usta Haritacı', desc: 'Herhangi bir oyun modunda 50 maç tamamla.', emoji: '🧭', reward: 5, target: 50 },
+    { id: 'w12', title: 'Zenginliğe Doğru', desc: 'Markette toplam 100 madalya harca.', emoji: '💸', reward: 5, target: 100 },
+    { id: 'w13', title: 'Seri Katil', desc: 'Üst üste 10 tahminde en az 4500 puan al.', emoji: '🔪', reward: 5, target: 10 },
+    { id: 'w14', title: 'Kusursuz Tahminci', desc: 'Tam olarak 5000 puanlık 15 tahmin yap.', emoji: '💎', reward: 5, target: 15 },
+    { id: 'w15', title: 'Hafta Sonu Savaşçısı', desc: 'Klasik Dünya Modunda 25 galibiyet al.', emoji: '⚔️', reward: 5, target: 25 },
+    /* YENİ 15 HAFTALIK GÖREV */
+    { id: 'w16', title: 'Şehir Plancısı', desc: 'Toplam 50 tahmin yap.', emoji: '🏙️', reward: 5, target: 50 },
+    { id: 'w17', title: 'Atlas Fatihi', desc: 'Dünya modunda 5 maç kazan.', emoji: '🗺️', reward: 5, target: 5 },
+    { id: 'w18', title: 'Para Babası', desc: 'Marketten toplam 5 ürün al.', emoji: '💰', reward: 5, target: 5 },
+    { id: 'w19', title: 'Kaybetmek Yok', desc: 'Hiç hata yapmadan 5 maç bitir (Kazan).', emoji: '🛡️', reward: 5, target: 5 },
+    { id: 'w20', title: 'Afrika Safarisi', desc: 'Afrika kıtasından 5 tahmin yap.', emoji: '🦁', reward: 5, target: 5 },
+    { id: 'w21', title: 'Hızlı Çekim', desc: 'Süreli Modda 10 maç kazan.', emoji: '🔫', reward: 5, target: 10 },
+    { id: 'w22', title: 'Zorlu Yollar', desc: 'Zor modda 50 tahmin yap.', emoji: '🧗', reward: 5, target: 50 },
+    { id: 'w23', title: 'İnatçı', desc: 'Oyunu toplam 10 saat oyna.', emoji: '🕰️', reward: 5, target: 36000 },
+    { id: 'w24', title: 'Değişim Şart', desc: 'Profil adını değiştir.', emoji: '🔄', reward: 5, target: 1 },
+    { id: 'w25', title: 'Usta Kaşif', desc: '20.000 puanlık tahmin barajını aş (Tek maç).', emoji: '🌟', reward: 5, target: 1 },
+    { id: 'w26', title: 'Dünya Turu', desc: 'Her kıtadan 10\'ar tahmin yap.', emoji: '✈️', reward: 5, target: 6 },
+    { id: 'w27', title: 'Nokta Atışı', desc: 'Tam tamına 5000 puanlık 25 tahmin.', emoji: '🎯', reward: 5, target: 25 },
+    { id: 'w28', title: 'Sabırlı', desc: 'Toplam süre meydan okumasında 5 maç kazan.', emoji: '⏳', reward: 5, target: 5 },
+    { id: 'w29', title: 'Görev Adamı', desc: '10 tane görev tamamla.', emoji: '📋', reward: 5, target: 10 },
+    { id: 'w30', title: 'Zirveye Tırmanış', desc: '10 Meydan okuma kazan.', emoji: '🏔️', reward: 5, target: 10 }
+];
+
+function loadQuestState() {
+    let def = { 
+        dailyDayId: -1, weeklyWeekId: -1, 
+        dailyProgress: [0,0,0], weeklyProgress: [0,0,0,0,0], 
+        dailyClaimed: [false,false,false], weeklyClaimed: [false,false,false,false,false],
+        d8Streak: 0, d18Streak: 0, d9Modes: [], w9Continents: {EU:0, AS:0, NA:0, SA:0, AF:0, OC:0}, w13Streak: 0, w5BoughtTitle: false
+    };
+    return JSON.parse(localStorage.getItem('weekWorldQuests')) || def;
+}
+function saveQuestState(qs) { localStorage.setItem('weekWorldQuests', JSON.stringify(qs)); }
+
+function getResetTimes() {
+    let now = new Date();
+    // Daily Reset (06:00)
+    let dailyReset = new Date(now); dailyReset.setHours(6,0,0,0);
+    if(now.getTime() >= dailyReset.getTime()) dailyReset.setDate(dailyReset.getDate() + 1);
+    
+    // Weekly Reset (Pazartesi 06:00)
+    let weeklyReset = new Date(now); weeklyReset.setHours(6,0,0,0);
+    let dayOfWeek = weeklyReset.getDay(); // 0=Sun, 1=Mon
+    let daysToMonday = (1 - dayOfWeek + 7) % 7;
+    if (daysToMonday === 0 && now.getTime() >= weeklyReset.getTime()) daysToMonday = 7;
+    weeklyReset.setDate(weeklyReset.getDate() + daysToMonday);
+
+    // Day ID (Days since Epoch offset to 06:00)
+    let dayId = Math.floor((now.getTime() - (6 * 3600000)) / 86400000);
+    // Week ID
+    let weekId = Math.floor((now.getTime() - (3 * 86400000) - (6 * 3600000)) / 604800000);
+
+    return { dailyReset, weeklyReset, dayId, weekId };
+}
+
+function updateQuestLogic() {
+    let qs = loadQuestState();
+    let times = getResetTimes();
+
+    if (qs.dailyDayId !== times.dayId) {
+        qs.dailyDayId = times.dayId;
+        qs.dailyProgress = [0,0,0]; qs.dailyClaimed = [false,false,false];
+        qs.d8Streak = 0; qs.d18Streak = 0; qs.d9Modes = [];
+        saveQuestState(qs);
+    }
+    if (qs.weeklyWeekId !== times.weekId) {
+        qs.weeklyWeekId = times.weekId;
+        qs.weeklyProgress = [0,0,0,0,0]; qs.weeklyClaimed = [false,false,false,false,false];
+        qs.w9Continents = {EU:0, AS:0, NA:0, SA:0, AF:0, OC:0}; qs.w13Streak = 0; qs.w5BoughtTitle = false;
+        saveQuestState(qs);
+    }
+}
+
+function getActiveQuests() {
+    updateQuestLogic();
+    let qs = loadQuestState();
+    let dailyTotalSets = Math.ceil(ALL_DAILY_QUESTS.length / 3);
+    let weeklyTotalSets = Math.ceil(ALL_WEEKLY_QUESTS.length / 5);
+    
+    let dailyIndex = Math.abs(qs.dailyDayId) % dailyTotalSets;
+    let weeklyIndex = Math.abs(qs.weeklyWeekId) % weeklyTotalSets;
+    
+    let activeDaily = ALL_DAILY_QUESTS.slice(dailyIndex * 3, dailyIndex * 3 + 3).filter(Boolean);
+    let activeWeekly = ALL_WEEKLY_QUESTS.slice(weeklyIndex * 5, weeklyIndex * 5 + 5).filter(Boolean);
+    
+    return { activeDaily, activeWeekly, qs };
+}
+
+function triggerQuest(id, amount = 1) {
+    let { activeDaily, activeWeekly, qs } = getActiveQuests();
+    let isDaily = id.startsWith('d');
+    let activeList = isDaily ? activeDaily : activeWeekly;
+    let progressList = isDaily ? qs.dailyProgress : qs.weeklyProgress;
+    let index = activeList.findIndex(q => q.id === id);
+    
+    if (index !== -1) {
+        let q = activeList[index];
+        if (progressList[index] < q.target) {
+            progressList[index] = Math.min(q.target, progressList[index] + amount);
+            saveQuestState(qs);
+            if (progressList[index] >= q.target && !(isDaily ? qs.dailyClaimed[index] : qs.weeklyClaimed[index])) {
+                showAchvNotification({ title: q.title, emoji: q.emoji, reward: 0 }, true);
+                triggerQuest('w29', 1); // Görev Adamı Tetiklemesi
+            }
+            if (document.getElementById('quest-menu').style.display === 'flex') renderQuests();
+        }
+    }
+}
+
+function claimQuest(type, index) {
+    let { activeDaily, activeWeekly, qs } = getActiveQuests();
+    let isDaily = type === 'daily';
+    let q = isDaily ? activeDaily[index] : activeWeekly[index];
+    
+    if (isDaily) qs.dailyClaimed[index] = true;
+    else qs.weeklyClaimed[index] = true;
+    
+    saveQuestState(qs);
+    addMedals(q.reward);
+    triggerQuest('d5', q.reward); triggerQuest('w10', q.reward);
+    updateUI(); renderQuests();
+}
+
+function openQuests() { document.getElementById('quest-menu').style.display = 'flex'; renderQuests(); updateQuestTimers(); }
+function closeQuests() { document.getElementById('quest-menu').style.display = 'none'; }
+
+function renderQuests() {
+    let { activeDaily, activeWeekly, qs } = getActiveQuests();
+    
+    const buildHtml = (q, progress, claimed, type, i) => {
+        let perc = Math.min(100, (progress / q.target) * 100);
+        let completed = progress >= q.target;
+        let btnHtml = completed && !claimed ? `<button class="quest-claim-btn" onclick="claimQuest('${type}', ${i})">ÖDÜLÜ AL</button>` : (claimed ? `<button class="quest-claim-btn" disabled>ALINDI</button>` : '');
+        return `
+            <div class="quest-item ${completed ? 'completed' : ''} ${claimed ? 'claimed' : ''}" title="${q.desc}">
+                <div class="quest-emoji">${q.emoji}</div>
+                <div class="quest-details">
+                    <div class="quest-title">${q.title} <span style="font-size: 0.8rem; font-weight: normal; color:#aaa;">(${progress}/${q.target})</span></div>
+                    <div class="quest-desc">${q.desc}</div>
+                    <div class="quest-progress-bar-bg"><div class="quest-progress-bar-fill" style="width: ${perc}%;"></div></div>
+                </div>
+                <div class="quest-reward">+${q.reward} 🏆</div>
+                ${btnHtml}
+            </div>
+        `;
+    };
+
+    document.getElementById('daily-quest-list').innerHTML = activeDaily.map((q, i) => buildHtml(q, qs.dailyProgress[i] || 0, qs.dailyClaimed[i], 'daily', i)).join('');
+    document.getElementById('weekly-quest-list').innerHTML = activeWeekly.map((q, i) => buildHtml(q, qs.weeklyProgress[i] || 0, qs.weeklyClaimed[i], 'weekly', i)).join('');
+    enableDragScroll('.drag-area');
+}
+
+setInterval(updateQuestTimers, 1000);
+function updateQuestTimers() {
+    if(document.getElementById('quest-menu').style.display !== 'flex') return;
+    let times = getResetTimes();
+    let now = new Date().getTime();
+    
+    let dDiff = times.dailyReset.getTime() - now;
+    let dH = Math.floor((dDiff % 86400000) / 3600000);
+    let dM = Math.floor((dDiff % 3600000) / 60000);
+    let dS = Math.floor((dDiff % 60000) / 1000);
+    document.getElementById('daily-timer').innerText = `Yenilenmeye Kalan Süre: ${String(dH).padStart(2,'0')}:${String(dM).padStart(2,'0')}:${String(dS).padStart(2,'0')}`;
+
+    let wDiff = times.weeklyReset.getTime() - now;
+    let wD = Math.floor(wDiff / 86400000);
+    let wH = Math.floor((wDiff % 86400000) / 3600000);
+    let wM = Math.floor((wDiff % 3600000) / 60000);
+    document.getElementById('weekly-timer').innerText = `Yenilenmeye Kalan Süre: ${wD} Gün ${String(wH).padStart(2,'0')}:${String(wM).padStart(2,'0')}`;
+}
+
+// DRAG TO SCROLL MANTIĞI
+function enableDragScroll(selector) {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(slider => {
+        let isDown = false, startX, startY, scrollLeft, scrollTop;
+        slider.style.cursor = 'grab';
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.style.cursor = 'grabbing';
+            startX = e.pageX - slider.offsetLeft;
+            startY = e.pageY - slider.offsetTop;
+            scrollLeft = slider.scrollLeft;
+            scrollTop = slider.scrollTop;
+        });
+        slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+        slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const y = e.pageY - slider.offsetTop;
+            const walkX = (x - startX) * 1.5;
+            const walkY = (y - startY) * 1.5;
+            slider.scrollLeft = scrollLeft - walkX;
+            slider.scrollTop = scrollTop - walkY;
+        });
+    });
+}
+
+// Helper: Get Continent
+function getContinent(cityName) {
+    if(["Londra", "Paris", "Berlin", "Roma", "Madrid", "Moskova", "Amsterdam", "Brüksel", "Viyana", "Atina", "Stokholm", "Varşova", "Prag", "Budapeşte", "Helsinki", "Oslo", "Kopenhag", "Zürih", "Dublin", "Reykjavik", "Bükreş", "Belgrad", "Sofya", "Kiev", "İstanbul"].includes(cityName)) return 'EU';
+    if(["Tokyo", "Dubai", "Pekin", "Seul", "Bangkok", "Singapur", "Yeni Delhi", "Kuala Lumpur", "Manila", "Cakarta", "Hanoi", "Taipei", "Bakü", "Tiflis", "Astana", "Amman", "Beyrut", "Riyad", "Tel Aviv", "Ankara", "İzmir", "Antalya"].includes(cityName)) return 'AS';
+    if(["New York", "Toronto", "Los Angeles", "Meksika City"].includes(cityName)) return 'NA';
+    if(["Rio de Janeiro", "Buenos Aires", "Santiago", "Lima", "Bogota"].includes(cityName)) return 'SA';
+    if(["Kahire", "Cape Town", "Lagos", "Nairobi", "Kazablanka"].includes(cityName)) return 'AF';
+    if(["Sidney", "Perth"].includes(cityName)) return 'OC';
+    return 'UNKNOWN';
+}
 
 /* --- ŞEHİRLER --- */
 var citiesEasy = [["İstanbul", 41.00, 28.97], ["Ankara", 39.93, 32.85], ["İzmir", 38.41, 27.12], ["Antalya", 36.89, 30.71], ["Londra", 51.50, -0.12], ["Paris", 48.85, 2.35], ["Berlin", 52.52, 13.40], ["Roma", 41.90, 12.49], ["Madrid", 40.41, -3.70], ["Tokyo", 35.67, 139.65], ["New York", 40.71, -74.00], ["Sidney", -33.86, 151.20], ["Moskova", 55.75, 37.61], ["Dubai", 25.20, 55.27], ["Amsterdam", 52.36, 4.89], ["Brüksel", 50.85, 4.35], ["Viyana", 48.20, 16.37], ["Atina", 37.98, 23.72], ["Kahire", 30.04, 31.23], ["Pekin", 39.90, 116.40], ["Seul", 37.56, 126.97], ["Rio de Janeiro", -22.90, -43.17], ["Buenos Aires", -34.60, -58.38], ["Toronto", 43.65, -79.38], ["Los Angeles", 34.05, -118.24], ["Meksika City", 19.43, -99.13], ["Bangkok", 13.75, 100.50], ["Singapur", 1.35, 103.81], ["Lizbon", 38.72, -9.13], ["Stokholm", 59.32, 18.06]];
@@ -679,8 +1100,14 @@ else baseLayer.addTo(map);
 var selectedCity, guessMarker=null, realMarker=null, line=null, score=0, timeLeft=120, roundActive=false, currentMode='normal', timerInterval, nextRoundInterval;
 
 function startCountdown(mode) {
-    currentMode = mode; document.getElementById('main-menu').style.visibility = 'hidden'; document.getElementById('challenge-menu').style.display = 'none'; document.getElementById('music-toggle').style.display = 'none';
+    currentMode = mode; document.getElementById('main-menu').style.visibility = 'hidden'; document.getElementById('challenge-menu').style.display = 'none'; document.getElementById('settings-toggle').style.display = 'none';
     const overlay = document.getElementById('start-countdown-overlay'); overlay.style.display = 'flex'; stopMusic();
+    
+    // GÖREV KANCALARI
+    triggerQuest('d13'); triggerQuest('w16'); 
+    if(mode === 'normal') triggerQuest('d19');
+    if(mode === 'speedrun') triggerQuest('d20');
+
     let c = 5; document.getElementById('countdown-num').innerText = c;
     let int = setInterval(() => { 
         c--; 
@@ -699,10 +1126,9 @@ function startGame() {
     document.getElementById('timer').style.visibility = (currentMode === 'hardcore' ? 'hidden' : 'visible');
     
     map.eachLayer(function(layer) { map.removeLayer(layer); });
-
     if(currentMode === 'blind_shot') { 
         if(profileData.mapStyle === 'Karanlık Harita') darkBlindLayer.addTo(map);
-        else blindLayer.addTo(map); 
+        else blindLayer.addTo(map);
         timeLeft = 180;
     } 
     else { 
@@ -722,7 +1148,8 @@ function startRound(first = false) {
     else if(currentMode === 'normal') timeLeft = 120;
     let pool = Math.random() < 0.5 ? citiesEasy : citiesHard; selectedCity = pool[Math.floor(Math.random()*pool.length)];
     document.getElementById("cityName").innerText = selectedCity[0];
-    roundActive = true; updateTimerUI(); clearInterval(timerInterval);
+    roundActive = true; updateTimerUI();
+    clearInterval(timerInterval);
     if(currentMode !== 'hardcore') { timerInterval = setInterval(() => { timeLeft--; updateTimerUI(); if(timeLeft<=0) gameOver("süre doldu!"); }, 1000); }
 }
 
@@ -734,7 +1161,6 @@ map.on('click', (e) => {
     guessMarker = L.marker(e.latlng).addTo(map); 
     document.getElementById("guessBtn").classList.add("active"); 
 
-    // Başarım Kontrolü: Penguenmi Görüyorum?
     if (e.latlng.lat <= -60) unlockAchievement('penguin');
 });
 
@@ -744,8 +1170,12 @@ function makeGuess() {
     document.getElementById("guessBtn").style.display = "none";
     let realPos = L.latLng(selectedCity[1], selectedCity[2]);
     let guessPos = guessMarker.getLatLng();
-    playBinocularSound();
+    
+    // YENİ KAĞIT SESİ!
+    playPaperSound();
+    
     map.flyTo(guessPos, 8, { duration: 1.5 });
+    
     setTimeout(() => {
         playWindSound(1.5);
         map.panTo(realPos, { animate: true, duration: 1.2 });
@@ -762,17 +1192,51 @@ function makeGuess() {
  
             animateScoreWithOverlay(roundScore);
             
-            // Başarım Kontrolü: Durmak Yok!
+            // GÖREV KANCALARI
+            let cityCont = getContinent(selectedCity[0]);
+            triggerQuest('w16'); 
+            if(currentMode === 'hardcore') triggerQuest('w22');
+            if(currentMode === 'blind_shot') triggerQuest('d22');
+            
+            if (roundScore === 5000) { triggerQuest('d2'); triggerQuest('w14'); triggerQuest('w27'); }
+            if (roundScore >= 4500 && cityCont === 'EU') triggerQuest('d3');
+            if (roundScore >= 4000 && selectedCity[0] === 'Tokyo') triggerQuest('d7');
+            if (roundScore >= 4500 && cityCont === 'SA') triggerQuest('d10');
+            if (roundScore >= 4000 && cityCont === 'AS') triggerQuest('d15');
+            if (roundScore >= 4000 && cityCont === 'NA') triggerQuest('d16');
+            if (roundScore >= 4500 && cityCont === 'AF') triggerQuest('w20');
+            if (roundScore >= 3000) triggerQuest('d14');
+            if (currentMode === 'speedrun' && roundScore >= 4500) triggerQuest('w2');
+            if (roundScore >= 4500) triggerQuest('w8');
+            
+            // Streak Tabanlı Görevler
+            let qs = loadQuestState();
+            if (currentMode === 'blind_shot' && roundScore >= 3000) {
+                qs.d8Streak++; if(qs.d8Streak >= 3) triggerQuest('d8');
+            } else { qs.d8Streak = 0; }
+            
             if (roundScore >= 4500) {
-                streak4500++;
-                localStorage.setItem('weekWorldStreak4500', streak4500);
-                if (streak4500 >= 3) unlockAchievement('unstoppable');
-            } else {
-                streak4500 = 0;
-                localStorage.setItem('weekWorldStreak4500', streak4500);
-            }
+                qs.w13Streak++; if(qs.w13Streak >= 10) triggerQuest('w13');
+            } else { qs.w13Streak = 0; }
 
-            // Diğer Başarım Kontrolleri
+            if (roundScore >= 4000) {
+                qs.d18Streak++; if(qs.d18Streak >= 2) triggerQuest('d18');
+            } else { qs.d18Streak = 0; }
+            
+            if (roundScore >= 4500 && cityCont !== 'UNKNOWN') {
+                qs.w9Continents[cityCont]++;
+                let continentsCompleted = Object.values(qs.w9Continents).filter(c => c >= 5).length;
+                let c10Completed = Object.values(qs.w9Continents).filter(c => c >= 10).length;
+                if(continentsCompleted > qs.weeklyProgress[8]) triggerQuest('w9', continentsCompleted - qs.weeklyProgress[8]);
+                if(c10Completed > qs.weeklyProgress[10]) triggerQuest('w26', c10Completed - qs.weeklyProgress[10]);
+            }
+            saveQuestState(qs);
+
+            if (roundScore >= 4500) {
+                streak4500++; localStorage.setItem('weekWorldStreak4500', streak4500);
+                if (streak4500 >= 3) unlockAchievement('unstoppable');
+            } else { streak4500 = 0; localStorage.setItem('weekWorldStreak4500', streak4500); }
+
             if (roundScore === 5000) unlockAchievement('guess_5k');
             if (roundScore > 0) unlockAchievement('first_right');
             if (roundScore === 0) unlockAchievement('first_wrong');
@@ -793,26 +1257,46 @@ function startMola() {
         if(molaTime <= 0) { 
             clearInterval(nextRoundInterval); timeLeft = mBase; 
             const curtain = document.getElementById('transition-curtain'); curtain.classList.add('active'); 
-             setTimeout(() => { map.setView([20,0], 3); startRound(); setTimeout(() => { curtain.classList.remove('active'); }, 200); }, 600); 
+            setTimeout(() => { map.setView([20,0], 3); startRound(); setTimeout(() => { curtain.classList.remove('active'); }, 200); }, 600); 
         } 
     }, 1000);
 }
 
 function gameOver(msg) { 
+    gamesPlayed++; gamesLost++; saveStats(); 
     clearInterval(timerInterval); clearInterval(nextRoundInterval); document.getElementById("result").style.display = "block";
     document.getElementById("result").innerHTML = `<h2>oyun bitti</h2><p>${msg}</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#ffcc00; border:none; border-radius:10px; font-weight:bold; color:black; cursor:pointer;\">lobiye dön</button>`;
 }
 
 function showFinalScreen() { 
+    gamesPlayed++; saveStats();
     const isCh = ['blind_shot', 'total_time'].includes(currentMode); 
     if(!isCh) { wins++; localStorage.setItem('weekWorldWins', wins); } 
-    else { medals++; localStorage.setItem('weekWorldMedals', medals); } 
+    else { challengesCompleted++; saveStats(); addMedals(1); triggerQuest('d5', 1); triggerQuest('w10', 1); } 
     
     // YENİ BAŞARIM KONTROLLERİ
     if(currentMode === 'blind_shot' && score >= 20000) unlockAchievement('blind_20k');
     if(currentMode === 'hardcore') unlockAchievement('hard_win');
-
     checkMilestoneAchievements();
+
+    // GÖREV KANCALARI
+    triggerQuest('d1'); triggerQuest('w11'); 
+    if (score >= 20000) triggerQuest('w25');
+    if (currentMode === 'hardcore') { triggerQuest('w1'); triggerQuest('d21'); }
+    if (currentMode === 'blind_shot') triggerQuest('w3');
+    if (currentMode === 'total_time' && timeLeft > 60) triggerQuest('w4');
+    if (currentMode === 'total_time') triggerQuest('w28');
+    if (profileData.mapStyle !== 'Varsayılan') triggerQuest('w6');
+    if (currentMode === 'normal') { triggerQuest('w15'); triggerQuest('w17'); }
+    if (currentMode === 'speedrun') triggerQuest('w21');
+    if (isCh) { triggerQuest('d11'); triggerQuest('w30'); }
+
+    let qs = loadQuestState();
+    if (!qs.d9Modes.includes(currentMode)) {
+        qs.d9Modes.push(currentMode); saveQuestState(qs);
+        triggerQuest('d9'); 
+    }
+
     document.getElementById("result").style.display = "block"; 
     document.getElementById("result").innerHTML = `<h2 style="color:green">tebrikler!</h2><p>25.000 puan barajını geçtin!</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#2962ff; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;\">lobiye dön</button>`;
 }
@@ -823,17 +1307,22 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); rend
 const globe = new THREE.Mesh(new THREE.SphereGeometry(2, 64, 64), new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg') })); scene.add(globe);
 const light = new THREE.DirectionalLight(0xffffff, 1.3); light.position.set(5,3,5); scene.add(light); scene.add(new THREE.AmbientLight(0x666666)); camera.position.z = 5.5;
 let isDrg = false, prevM = {x:0, y:0}; document.getElementById('world-3d-container').onmousedown = () => isDrg = true;
-window.onmouseup = () => isDrg = false; window.onmousemove = (e) => { if(isDrg) { globe.rotation.y += (e.clientX - prevM.x)*0.01;
-globe.rotation.x += (e.clientY - prevM.y)*0.01; } prevM = {x:e.clientX, y:e.clientY}; };
-function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); } animate(); updateUI();
-// OYUN SÜRESİ
+window.onmouseup = () => isDrg = false; window.onmousemove = (e) => { if(isDrg) { globe.rotation.y += (e.clientX - prevM.x)*0.01; globe.rotation.x += (e.clientY - prevM.y)*0.01; } prevM = {x:e.clientX, y:e.clientY}; };
+function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); } animate(); updateUI(); updateQuestLogic(); enableDragScroll('.drag-area');
+
+// OYUN SÜRESİ VE SÜRE GÖREVLERİ
 setInterval(() => { 
     totalSeconds++; 
     localStorage.setItem('weekWorldPlaytime', totalSeconds); 
     let d = Math.floor(totalSeconds / 86400), h = Math.floor((totalSeconds % 86400) / 3600), m = Math.floor((totalSeconds % 3600) / 60); 
     if(document.getElementById('playtime-display')) document.getElementById('playtime-display').innerText = `${d} gün ${h} saat ${m} dakika`;
     if(totalSeconds >= 36000) unlockAchievement('loyal_10h');
+    
+    triggerQuest('d4', 1);
+    triggerQuest('w7', 1);
+    triggerQuest('w23', 1);
 }, 1000);
+
 </script>
 </body>
 </html>
