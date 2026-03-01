@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Week.world - Pro Edition PC</title>
+<title>Week.world vers. 1.9</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -1436,39 +1436,63 @@ function animateScoreWithOverlay(addedScore) {
     const overlay = document.getElementById('score-animation-overlay');
     const mainScoreEl = document.getElementById('anim-main-score');
     const addedScoreEl = document.getElementById('anim-added-score');
+    const topScoreEl = document.getElementById('score');
+
+    let startScore = score - addedScore;
+    let endScore = score;
 
     overlay.style.display = 'flex';
-    mainScoreEl.innerText = score - addedScore;
+    mainScoreEl.innerText = startScore;
     addedScoreEl.innerText = "+" + addedScore;
 
+    // 1. Yazılar ekrana pop-up efektiyle gelir
     setTimeout(() => {
         mainScoreEl.classList.add('active');
         addedScoreEl.classList.add('active');
-        playScoreTick();
+        playScoreTick(); // İlk belirdiğindeki pop sesi
     }, 50);
 
+    // 2. Pop-up bittikten sonra sayılar hızlıca artmaya başlar
     setTimeout(() => {
-        mainScoreEl.innerText = score;
-        addedScoreEl.classList.remove('active');
-        document.getElementById('score').innerText = score;
-    }, 800);
+        let duration = 800; // Sayma animasyonu süresi (ms)
+        let startTimestamp = null;
+        let lastTickTime = 0;
 
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            
+            // Sayıyı orantılı olarak hesapla
+            const currentScore = Math.floor(progress * (endScore - startScore) + startScore);
+            mainScoreEl.innerText = currentScore;
+            topScoreEl.innerText = currentScore;
+
+            // Tık tık sayma sesi (her 60ms'de bir)
+            if (timestamp - lastTickTime > 60 && progress < 1) {
+                playClockTick(true);
+                lastTickTime = timestamp;
+            }
+
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                mainScoreEl.innerText = endScore;
+                topScoreEl.innerText = endScore;
+                addedScoreEl.classList.remove('active');
+            }
+        };
+        window.requestAnimationFrame(step);
+    }, 600);
+
+    // 3. Animasyon biter, ekran temizlenir ve mola başlar
     setTimeout(() => {
         mainScoreEl.classList.remove('active');
         overlay.style.display = 'none';
         
-        // Animasyon bitince diğer tura geçişi tetikle
         if (score < 25000) {
-            if (currentMode === 'hardcore') {
-                let distText = document.getElementById("distanceBox").innerText;
-                if (distText && parseInt(distText.split(' ')[0]) <= 500) {
-                    startMola();
-                }
-            } else {
-                startMola();
-            }
+            startMola();
         }
-    }, 2000);
+    }, 2200);
 }
 
 function startMola() {
