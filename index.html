@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Week.world vers. 1.9</title>
+<title>Week.world vers. 2.0</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -37,12 +37,12 @@
     #transition-curtain.active { bottom: 0; }
 
     /* MENÜ VE EKRANLAR */
-    #main-menu, #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu, #quest-menu, #settings-menu, #season-pass-menu {
+    #main-menu, #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu, #quest-menu, #settings-menu, #season-pass-menu, #modes-menu, #daily-rewards-menu {
         position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #050505; z-index: 9999;
         display: flex; justify-content: space-between; align-items: center;
         transition: opacity 0.5s ease;
     }
-    #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu, #quest-menu, #settings-menu, #season-pass-menu { 
+    #challenge-menu, #profile-edit-menu, #market-menu, #achievement-menu, #quest-menu, #settings-menu, #season-pass-menu, #modes-menu, #daily-rewards-menu { 
         display: none; flex-direction: column; justify-content: center; z-index: 10001; 
     }
 
@@ -70,8 +70,7 @@
         z-index: 50000; display: none; align-items: center; justify-content: center; pointer-events: none;
     }
     .score-anim-container { position: relative; display: flex; align-items: center; justify-content: center; }
-    .big-score-text { font-size: 10rem; font-weight: 900; color: #ffcc00; transform: scale(0);
-        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .big-score-text { font-size: 10rem; font-weight: 900; color: #ffcc00; transform: scale(0); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     .added-score-text {
         position: absolute; top: -60px; left: -40px; font-size: 4rem; font-weight: 900; color: #ffcc00;
         opacity: 0; transform: translateY(20px); transition: 0.5s ease-out;
@@ -183,12 +182,15 @@
     }
     .achv-notif-text-container { display: flex; flex-direction: column; position: relative; }
     #achv-medal-badge {
-        position: absolute; top: -10px; right: -20px; background: #ffcc00; color: black;
+        position: absolute; top: -10px; right: -20px;
+        background: #ffcc00; color: black;
         font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 10px; display: none;
     }
 
     /* ÖZEL ÇERÇEVELER */
-    .fire-frame { border: 4px solid transparent !important; background-image: linear-gradient(#000, #000), linear-gradient(to right, orange, red, yellow); background-origin: border-box; background-clip: content-box, border-box; animation: rotateGradient 2s linear infinite; }
+    .fire-frame { border: 4px solid transparent !important;
+        background-image: linear-gradient(#000, #000), linear-gradient(to right, orange, red, yellow); background-origin: border-box; background-clip: content-box, border-box; animation: rotateGradient 2s linear infinite;
+    }
     @keyframes rotateGradient { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
     /* GÖREVLER MENÜSÜ CSS */
@@ -261,10 +263,9 @@
 
 <div id="main-menu">
     <div class="side-menu-left">
-        <div class="mode-card" onclick="startCountdown('normal')"><span class="mode-title">🌍 DÜNYA MODU</span><span class="mode-desc">Klasik deneyim. Hedef 25.000 puan.</span></div>
-        <div class="mode-card" onclick="startCountdown('speedrun')"><span class="mode-title">⏱️ SÜRELİ MOD</span><span class="mode-desc">500km altına inersen süre 1 dakikaya sıfırlanır!</span></div>
-        <div class="mode-card" onclick="startCountdown('hardcore')"><span class="mode-title">🧭 ZOR MOD</span><span class="mode-desc">Hata payı yok (500km sınır).</span></div>
+        <div class="mode-card" onclick="openModes()"><span class="mode-title">🎮 OYNA</span><span class="mode-desc">Oyun modlarını seç ve maceraya başla.</span></div>
         <div class="mode-card" onclick="openChallenges()"><span class="mode-title">📚 MEYDAN OKUMALAR</span><span class="mode-desc">Özel ödüller ve madalyalar kazan.</span></div>
+        <div class="mode-card" onclick="openDailyRewards()"><span class="mode-title">🎁 GÜNLÜK ÖDÜLLER</span><span class="mode-desc">Her gün gir, ödüllerini topla!</span></div>
     </div>
     
     <div class="center-stage">
@@ -306,8 +307,25 @@
     <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeAchievements()">← GERİ DÖN</button>
 </div>
 
+<div id="modes-menu">
+    <h2 style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-bottom: 40px;">Oyun Modları</h2>
+    <div style="display:flex; gap:20px; justify-content: center; flex-wrap: wrap;">
+        <div class="mode-card" onclick="startCountdown('normal')"><span class="mode-title">🌍 DÜNYA MODU</span><span class="mode-desc">Klasik deneyim. Hedef 25.000 puan.</span></div>
+        <div class="mode-card" onclick="startCountdown('speedrun')"><span class="mode-title">⏱️ SÜRELİ MOD</span><span class="mode-desc">500km altına inersen süre 1 dakikaya sıfırlanır!</span></div>
+        <div class="mode-card" onclick="startCountdown('hardcore')"><span class="mode-title">🧭 ZOR MOD</span><span class="mode-desc">Hata payı yok (500km sınır).</span></div>
+    </div>
+    <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeModes()">← GERİ DÖN</button>
+</div>
+
+<div id="daily-rewards-menu">
+    <h2 style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-bottom: 10px;">🎁 Günlük Ödüller</h2>
+    <div id="daily-reward-timer" style="color: #aaa; margin-bottom: 30px; font-size: 1.2rem;">Sonraki ödüle: --:--:--</div>
+    <div id="daily-rewards-grid" style="display:flex; gap:15px; max-width: 900px; flex-wrap: wrap; justify-content: center;"></div>
+    <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeDailyRewards()">← GERİ DÖN</button>
+</div>
+
 <div id="season-pass-menu">
-    <h2 style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-top: 50px; margin-bottom: 0;">🎫 Sezon Bileti</h2>
+    <h2 style="font-size: 3rem; font-weight: 900; color: #ffcc00; margin-top: 50px; margin-bottom: 0;">🎫 Sezon 2: Yaz Gezegenleri</h2>
     <div style="color:#aaa; font-size:1.2rem; margin-bottom: 20px;">Ödülleri kazanmak için oyun oynayarak XP topla! Toplam XP: <span id="pass-total-xp" style="color:white; font-weight:bold;">0</span></div>
     
     <div class="pass-container drag-area" id="pass-grid"></div>
@@ -395,7 +413,6 @@ let totalSeconds = parseInt(localStorage.getItem('weekWorldPlaytime')) || 0;
 let profileData = JSON.parse(localStorage.getItem('weekWorldProfile')) || { name: "Oyuncu", title: "YENİ OYUNCU", avatar: "https://i.ibb.co/vz6mXmX/default-avatar.png", frame: "", ownedAvatars: ["https://i.ibb.co/vz6mXmX/default-avatar.png"], ownedFrames: [], ownedTitles: ["YENİ OYUNCU", "GEZGİN"] };
 if (!profileData.ownedMapStyles) profileData.ownedMapStyles = ["Varsayılan"];
 if (!profileData.mapStyle) profileData.mapStyle = "Varsayılan";
-
 /* --- BAŞARIMLAR VERİ TABANI --- */
 let unlockedAchievements = JSON.parse(localStorage.getItem('weekWorldAchievements')) || [];
 let spentMedals = parseInt(localStorage.getItem('weekWorldSpentMedals')) || 0;
@@ -406,7 +423,6 @@ let gamesPlayed = parseInt(localStorage.getItem('weekWorldGamesPlayed')) || 0;
 let totalMedalsEarned = parseInt(localStorage.getItem('weekWorldTotalMedalsEarned')) || medals;
 let gamesLost = parseInt(localStorage.getItem('weekWorldGamesLost')) || 0;
 let challengesCompleted = parseInt(localStorage.getItem('weekWorldChallengesCompleted')) || 0;
-
 function saveStats() {
     localStorage.setItem('weekWorldGamesPlayed', gamesPlayed);
     localStorage.setItem('weekWorldTotalMedalsEarned', totalMedalsEarned);
@@ -445,7 +461,6 @@ const achievementsData = [
     { id: 'achv_mid_7', title: 'Hız Tutkunu', desc: 'Süreli modda 20 maç kazan.', emoji: '⚡', reward: 6 },
     { id: 'achv_mid_8', title: 'Usta Savaşçı', desc: 'Zor modda 25 maç kazan.', emoji: '⚔️', reward: 6 }
 ];
-
 /* --- SES MOTORU --- */
 let audioCtx = null, musicLoopInterval = null, currentMusicType = null;
 let isMusicMuted = localStorage.getItem('weekWorldMuted') === 'true';
@@ -734,7 +749,7 @@ const createSVG = (color, text) => `data:image/svg+xml;charset=UTF-8,` + encodeU
 const createSpecialSVG = (bg, emoji) => `data:image/svg+xml;charset=UTF-8,` + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='150' height='150'><rect width='150' height='150' fill='${bg}'/><text x='50%' y='50%' font-size='60' text-anchor='middle' dy='.35em'>${emoji}</text></svg>`);
 const coloredProducts = [
     /* PASS ÜRÜNLERİ */
-    { id: 't_season1', passOnly: true, type: 'title', name: 'İlk Sezon!', titleColor: '#ffffff' },
+    { id: 't_season1', passOnly: true, type: 'title', name: 'Yaz Gezegeni', titleColor: '#ffffff' },
     { id: 'p_robot', passOnly: true, type: 'photo', name: 'Robot', url: createSpecialSVG('#2c3e50', '🤖') },
     { id: 't_apprentice', passOnly: true, type: 'title', name: 'Çırak', titleColor: '#aaaaaa' },
     { id: 'f_silver', passOnly: true, type: 'frame', name: 'Gümüş', color: '#c0c0c0' },
@@ -877,8 +892,7 @@ function updateUI() {
     let emoji = wins < 20 ? "⛓️" : wins < 40 ? "🥈" : wins < 60 ? "🥇" : "💎"; document.getElementById('rank-emoji').innerText = emoji;
     document.getElementById('rank-name').innerText = wins < 20 ? "Demir" : wins < 40 ? "Gümüş" : wins < 60 ? "Altın" : "Elmas";
     const ticks = document.getElementById('win-ticks'); ticks.innerHTML = '';
-    for(let i=0; i<20; i++) { let t = document.createElement('div'); t.className = 'tick' + (i < (wins % 20) ? ' active' : '');
-    ticks.appendChild(t); }
+    for(let i=0; i<20; i++) { let t = document.createElement('div'); t.className = 'tick' + (i < (wins % 20) ? ' active' : ''); ticks.appendChild(t); }
     
     if(document.getElementById('pass-total-xp')) document.getElementById('pass-total-xp').innerText = (parseInt(localStorage.getItem('weekWorldSeasonXP')) || 0);
 }
@@ -888,6 +902,8 @@ function openMarket() { document.getElementById('market-menu').style.display = '
 function closeMarket() { document.getElementById('market-menu').style.display = 'none'; }
 function openChallenges() { document.getElementById('challenge-menu').style.display = 'flex'; updateUI(); }
 function closeChallenges() { document.getElementById('challenge-menu').style.display = 'none'; }
+function openModes() { document.getElementById('modes-menu').style.display = 'flex'; }
+function closeModes() { document.getElementById('modes-menu').style.display = 'none'; }
 function openProfileEdit() { document.getElementById('profile-edit-menu').style.display = 'flex'; renderInventory(); }
 function closeProfileEdit() { 
     let newName = document.getElementById('name-input').value;
@@ -898,9 +914,123 @@ function closeProfileEdit() {
     document.getElementById('profile-edit-menu').style.display = 'none';
 }
 
+/* --- GÜNLÜK ÖDÜLLER SİSTEMİ --- */
+const dailyRewardsConfig = [3, 3, 3, 5, 8, 10, 15];
+
+function getDailyState() {
+    return JSON.parse(localStorage.getItem('weekWorldDailyState')) || { currentDay: 0, lastClaimDate: null };
+}
+
+function saveDailyState(state) {
+    localStorage.setItem('weekWorldDailyState', JSON.stringify(state));
+}
+
+function openDailyRewards() {
+    document.getElementById('daily-rewards-menu').style.display = 'flex';
+    renderDailyRewards();
+    updateDailyRewardTimer();
+}
+
+function closeDailyRewards() {
+    document.getElementById('daily-rewards-menu').style.display = 'none';
+}
+
+function renderDailyRewards() {
+    let state = getDailyState();
+    let today = new Date().toDateString();
+    let grid = document.getElementById('daily-rewards-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    let isClaimedToday = (state.lastClaimDate === today);
+
+    dailyRewardsConfig.forEach((reward, i) => {
+        let status = 'locked'; 
+        if (i < state.currentDay) status = 'claimed';
+        else if (i === state.currentDay && !isClaimedToday) status = 'available';
+        else if (i === state.currentDay && isClaimedToday) status = 'locked'; 
+
+        let btnHtml = '';
+        let cardClass = 'pass-tier';
+
+        if (status === 'claimed') {
+            cardClass += ' claimed';
+            btnHtml = `<button class="buy-btn" disabled style="background:#444; color:#aaa;">ALINDI</button>`;
+        } else if (status === 'available') {
+            cardClass += ' unlocked';
+            btnHtml = `<button class="buy-btn" style="background:#00c853;" onclick="claimDailyReward()">ÖDÜLÜ AL</button>`;
+        } else {
+            btnHtml = `<button class="buy-btn" disabled style="background:#333;"><span style="font-size:1.2rem;">🔒</span> KİLİTLİ</button>`;
+        }
+
+        let card = document.createElement('div');
+        card.className = cardClass;
+        card.style.width = "120px";
+        card.style.minWidth = "120px";
+        card.innerHTML = `
+            <div class="tier-level ${status !== 'locked' ? 'unlocked' : ''}">GÜN ${i+1}</div>
+            <div style="font-size:2.5rem; margin:15px 0;">🏆</div>
+            <div style="font-weight:bold; color:#ffcc00; margin-bottom:15px;">${reward} Madalya</div>
+            ${btnHtml}
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function claimDailyReward() {
+    let state = getDailyState();
+    let today = new Date().toDateString();
+
+    if (state.lastClaimDate === today) return;
+
+    let reward = dailyRewardsConfig[state.currentDay];
+    addMedals(reward);
+    
+    state.lastClaimDate = today;
+    state.currentDay++;
+
+    if (state.currentDay >= dailyRewardsConfig.length) {
+        state.currentDay = 0; 
+    }
+
+    saveDailyState(state);
+    renderDailyRewards();
+    updateUI();
+    updateDailyRewardTimer();
+}
+
+function updateDailyRewardTimer() {
+    let menu = document.getElementById('daily-rewards-menu');
+    if(!menu || menu.style.display !== 'flex') return;
+    
+    let state = getDailyState();
+    let today = new Date().toDateString();
+    let timerEl = document.getElementById('daily-reward-timer');
+
+    if (state.lastClaimDate === today) {
+        let now = new Date();
+        let midnight = new Date(now);
+        midnight.setHours(24, 0, 0, 0);
+        let diff = midnight.getTime() - now.getTime();
+
+        let h = Math.floor((diff % 86400000) / 3600000);
+        let m = Math.floor((diff % 3600000) / 60000);
+        let s = Math.floor((diff % 60000) / 1000);
+
+        timerEl.innerText = `Sonraki ödüle: ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        
+        if (diff <= 1000) {
+            setTimeout(renderDailyRewards, 1500);
+        }
+    } else {
+        timerEl.innerText = `Ödülün hazır! Hemen al!`;
+    }
+}
+setInterval(updateDailyRewardTimer, 1000);
+
 /* --- SEZON BİLETİ SİSTEMİ --- */
 const passRewardsData = [
-    { tier: 1, itemType: 'title', prodId: 't_season1', label: 'İlk Sezon!', display: `<div style="color:white; font-weight:bold; font-size:1.2rem;">İlk Sezon!</div>` },
+    { tier: 1, itemType: 'title', prodId: 't_season1', label: 'Yaz Gezegeni', display: `<div style="color:white; font-weight:bold; font-size:1.2rem;">Yaz Gezegeni</div>` },
     { tier: 2, itemType: 'medal', amount: 2, label: '2 Madalya', display: `<div style="font-size:3rem;">🏆</div>` },
     { tier: 3, itemType: 'photo', prodId: 'p_robot', label: 'Robot Fotoğrafı', display: `<img src="${createSpecialSVG('#2c3e50', '🤖')}" style="width:70px; border-radius:10px;">` },
     { tier: 4, itemType: 'title', prodId: 't_apprentice', label: 'Çırak Ünvanı', display: `<div style="color:#aaaaaa; font-weight:bold; font-size:1.2rem;">Çırak</div>` },
@@ -1012,8 +1142,19 @@ function claimPassReward(index) {
     updateUI();
 }
 
+function getSeasonEndDate() {
+    let endDate = localStorage.getItem('weekWorldSeason2EndDate');
+    if (!endDate) {
+        let end = new Date();
+        end.setDate(end.getDate() + 90);
+        endDate = end.getTime();
+        localStorage.setItem('weekWorldSeason2EndDate', endDate);
+    }
+    return parseInt(endDate);
+}
+
 function updatePassTimer() {
-    let end = new Date("2026-04-01T00:00:00").getTime();
+    let end = getSeasonEndDate();
     let now = new Date().getTime();
     let diff = end - now;
     if (diff < 0) diff = 0;
@@ -1049,7 +1190,6 @@ const ALL_DAILY_QUESTS = [
     { id: 'd21', title: 'Avcı', desc: 'Zor modda 1 maç kazan.', emoji: '🧭', reward: 2, target: 1 },
     { id: 'd22', title: 'Gözlemci', desc: 'Kör Atışta 1 tahmin yap.', emoji: '🌑', reward: 2, target: 1 }
 ];
-
 const ALL_WEEKLY_QUESTS = [
     { id: 'w1', title: 'Zor Mod Şampiyonu!', desc: 'Zor modda 10 galibiyet al.', emoji: '☠️', reward: 5, target: 10 },
     { id: 'w2', title: 'Zamanla Yarış', desc: 'Süreli modda 30 tane minimum 4.500 puanlık tahmin yap.', emoji: '🏎️', reward: 5, target: 30 },
@@ -1204,7 +1344,7 @@ function renderQuests() {
                 <div class="quest-reward">+${q.reward} 🏆</div>
                 ${btnHtml}
             </div>
-         `;
+        `;
     };
 
     document.getElementById('daily-quest-list').innerHTML = activeDaily.map((q, i) => buildHtml(q, qs.dailyProgress[i] || 0, qs.dailyClaimed[i], 'daily', i)).join('');
@@ -1240,16 +1380,16 @@ function enableDragScroll(selector) {
             isDown = true; slider.style.cursor = 'grabbing';
             startX = e.pageX - slider.offsetLeft; startY = e.pageY - slider.offsetTop;
             scrollLeft = slider.scrollLeft; scrollTop = slider.scrollTop;
-         });
+        });
         slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
         slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
         slider.addEventListener('mousemove', (e) => {
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - slider.offsetLeft; const y = e.pageY - slider.offsetTop;
-             const walkX = (x - startX) * 1.5; const walkY = (y - startY) * 1.5;
+            const walkX = (x - startX) * 1.5; const walkY = (y - startY) * 1.5;
             slider.scrollLeft = scrollLeft - walkX; slider.scrollTop = scrollTop - walkY;
-});
+        });
     });
 }
 
@@ -1281,7 +1421,11 @@ else baseLayer.addTo(map);
 var selectedCity, guessMarker=null, realMarker=null, line=null, score=0, timeLeft=120, roundActive=false, currentMode='normal', timerInterval, nextRoundInterval;
 
 function startCountdown(mode) {
-    currentMode = mode; document.getElementById('main-menu').style.visibility = 'hidden'; document.getElementById('challenge-menu').style.display = 'none'; document.getElementById('settings-toggle').style.display = 'none';
+    currentMode = mode; 
+    document.getElementById('main-menu').style.visibility = 'hidden'; 
+    document.getElementById('challenge-menu').style.display = 'none'; 
+    document.getElementById('modes-menu').style.display = 'none';
+    document.getElementById('settings-toggle').style.display = 'none';
     const overlay = document.getElementById('start-countdown-overlay'); overlay.style.display = 'flex'; stopMusic();
     
     triggerQuest('d13'); triggerQuest('w16'); 
@@ -1296,7 +1440,7 @@ function startCountdown(mode) {
             clearInterval(int); overlay.classList.add('slide-up-out'); 
             setTimeout(() => { overlay.style.display='none'; if(!isMusicMuted) startGameMusic(); startGame(); }, 600); 
         } 
-     }, 1000);
+    }, 1000);
 }
 
 function startGame() {
@@ -1326,6 +1470,7 @@ function startRound(first = false) {
     document.getElementById("distanceBox").style.display="none"; document.getElementById("guessBtn").style.display="block";
     if(currentMode === 'speedrun' && first) timeLeft = 60;
     else if(currentMode === 'normal') timeLeft = 120;
+
     let pool = Math.random() < 0.5 ? citiesEasy : citiesHard; selectedCity = pool[Math.floor(Math.random()*pool.length)];
     document.getElementById("cityName").innerText = selectedCity[0];
     roundActive = true; updateTimerUI();
@@ -1362,13 +1507,12 @@ function makeGuess() {
             realMarker = L.marker(realPos).addTo(map);
             line = L.polyline([guessPos, realPos], {color: 'red', weight: 3}).addTo(map);
             let dist = Math.round(map.distance(guessPos, realPos) / 1000);
-         
+            
             if(currentMode === 'hardcore' && dist > 500) { gameOver(`hata payını aştın! mesafe: ${dist} km`); return; }
             if(currentMode === 'speedrun' && dist <= 500) timeLeft = 60;
             let roundScore = Math.max(0, 5000 - (dist * 5));
             score += roundScore;
             document.getElementById("distanceBox").innerText = `${dist} km | +${roundScore} puan`;
-         
             document.getElementById("distanceBox").style.display = "block";
  
             animateScoreWithOverlay(roundScore);
@@ -1408,7 +1552,6 @@ function makeGuess() {
             
             if (roundScore >= 4500 && cityCont !== 'UNKNOWN') {
                 qs.w9Continents[cityCont]++;
-                // Çökmeyi engellemek için doğrudan quest trigger fonksiyonunu tek seferlik ilerletme mantığıyla çağırdık.
                 if (qs.w9Continents[cityCont] === 5) triggerQuest('w9', 1);
                 if (qs.w9Continents[cityCont] === 10) triggerQuest('w26', 1);
                 
@@ -1416,6 +1559,7 @@ function makeGuess() {
                 if(anyContinent20) unlockAchievement('achv_mid_6');
             }
             saveQuestState(qs);
+
             if (roundScore >= 4500) {
                 streak4500++;
                 localStorage.setItem('weekWorldStreak4500', streak4500);
@@ -1506,15 +1650,15 @@ function startMola() {
         if(molaTime <= 0) { 
             clearInterval(nextRoundInterval); timeLeft = mBase; 
             const curtain = document.getElementById('transition-curtain'); curtain.classList.add('active'); 
-           
-             setTimeout(() => { map.setView([20,0], 3); startRound(); setTimeout(() => { curtain.classList.remove('active'); }, 200); }, 600); 
+            setTimeout(() => { map.setView([20,0], 3); startRound(); setTimeout(() => { curtain.classList.remove('active'); }, 200); }, 600); 
         } 
     }, 1000);
 }
 
 function gameOver(msg) { 
     gamesPlayed++; gamesLost++; saveStats(); 
-    localStorage.setItem('weekWorldPendingXP', 75); // Kaybetse de XP veriyoruz
+    localStorage.setItem('weekWorldPendingXP', 75);
+    // Kaybetse de XP veriyoruz
     clearInterval(timerInterval); clearInterval(nextRoundInterval); document.getElementById("result").style.display = "block";
     document.getElementById("result").innerHTML = `<h2>oyun bitti</h2><p>${msg}</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#ffcc00; border:none; border-radius:10px; font-weight:bold; color:black; cursor:pointer;\">lobiye dön</button>`;
 }
@@ -1583,9 +1727,11 @@ function playXPAnimation(addedXP) {
     let currentTierXP = currentXP % 1000;
     fill.style.width = (currentTierXP / 10) + '%';
     barText.innerText = `${currentTierXP} / 1000 XP`;
+
     // 1. Container İçeri Kayar (1.5s)
     container.classList.add('show');
     playXPAnimSound('slide');
+
     setTimeout(() => {
         // 2. XP Sayısı Pop-Up (1s)
         text.classList.add('pop');
@@ -1595,18 +1741,16 @@ function playXPAnimation(addedXP) {
             // 3. Parçalanma ve Barın Dolması (1.5s)
             document.querySelectorAll('.shatter-span').forEach(s => s.classList.add('shatter-active'));
             playXPAnimSound('shatter');
-             
+            
             let newXP = currentXP + addedXP;
             let newTierXP = newXP % 1000;
             
             if (Math.floor(newXP / 1000) > currentTier) {
                  fill.style.width = '100%';
-            
                  barText.innerText = `1000 / 1000 XP`;
                  setTimeout(() => { 
                      fill.style.transition = 'none'; fill.style.width = '0%'; 
                      barText.innerText = `0 / 1000 XP`;
-                 
                      setTimeout(() => { 
                          fill.style.transition = 'width 1.5s ease-in-out'; 
                          fill.style.width = (newTierXP/10) + '%';
@@ -1624,8 +1768,7 @@ function playXPAnimation(addedXP) {
                 // 4. Container Dışarı Kayar
                 container.classList.remove('show');
                 setTimeout(() => { text.classList.remove('pop'); text.innerHTML=''; }, 1500);
-            }, 2500);
-            // Kullanıcı ilerlemeyi izlesin diye bekleme süresi
+            }, 2500); // Kullanıcı ilerlemeyi izlesin diye bekleme süresi
             
         }, 1500);
     }, 1500); 
