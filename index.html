@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Week.world vers. 2.0</title>
+<title>Week.world Summer</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -16,6 +16,11 @@
 
     body{margin:0;font-family:'Segoe UI',Arial;overflow:hidden; background: #000; color: white;}
     #map{height:100vh; width:100%; cursor:crosshair; background: #222; position: absolute; top:0; left:0; z-index: 1;}
+
+    /* YAZ ETKİNLİĞİ HARİTA FİLTRESİ */
+    #map.summer-map .leaflet-tile-pane {
+        filter: sepia(0.6) hue-rotate(5deg) saturate(2.5) brightness(0.95);
+    }
 
     /* AYARLAR BUTONU */
     #settings-toggle {
@@ -313,6 +318,7 @@
         <div class="mode-card" onclick="startCountdown('normal')"><span class="mode-title">🌍 DÜNYA MODU</span><span class="mode-desc">Klasik deneyim. Hedef 25.000 puan.</span></div>
         <div class="mode-card" onclick="startCountdown('speedrun')"><span class="mode-title">⏱️ SÜRELİ MOD</span><span class="mode-desc">500km altına inersen süre 1 dakikaya sıfırlanır!</span></div>
         <div class="mode-card" onclick="startCountdown('hardcore')"><span class="mode-title">🧭 ZOR MOD</span><span class="mode-desc">Hata payı yok (500km sınır).</span></div>
+        <div class="mode-card" onclick="startCountdown('summer_event')"><span class="mode-title">☀️ YAZ ETKİNLİĞİ</span><span class="mode-desc">2 kat xp kazanmak için bu modu deneyebilirsin!</span></div>
     </div>
     <button class="back-btn" style="position: absolute; bottom: 40px; left: 40px;" onclick="closeModes()">← GERİ DÖN</button>
 </div>
@@ -916,7 +922,6 @@ function closeProfileEdit() {
 
 /* --- GÜNLÜK ÖDÜLLER SİSTEMİ --- */
 const dailyRewardsConfig = [3, 3, 3, 5, 8, 10, 15];
-
 function getDailyState() {
     return JSON.parse(localStorage.getItem('weekWorldDailyState')) || { currentDay: 0, lastClaimDate: null };
 }
@@ -941,7 +946,6 @@ function renderDailyRewards() {
     let grid = document.getElementById('daily-rewards-grid');
     if (!grid) return;
     grid.innerHTML = '';
-
     let isClaimedToday = (state.lastClaimDate === today);
 
     dailyRewardsConfig.forEach((reward, i) => {
@@ -980,7 +984,6 @@ function renderDailyRewards() {
 function claimDailyReward() {
     let state = getDailyState();
     let today = new Date().toDateString();
-
     if (state.lastClaimDate === today) return;
 
     let reward = dailyRewardsConfig[state.currentDay];
@@ -988,7 +991,6 @@ function claimDailyReward() {
     
     state.lastClaimDate = today;
     state.currentDay++;
-
     if (state.currentDay >= dailyRewardsConfig.length) {
         state.currentDay = 0; 
     }
@@ -1002,23 +1004,19 @@ function claimDailyReward() {
 function updateDailyRewardTimer() {
     let menu = document.getElementById('daily-rewards-menu');
     if(!menu || menu.style.display !== 'flex') return;
-    
     let state = getDailyState();
     let today = new Date().toDateString();
     let timerEl = document.getElementById('daily-reward-timer');
-
     if (state.lastClaimDate === today) {
         let now = new Date();
         let midnight = new Date(now);
         midnight.setHours(24, 0, 0, 0);
         let diff = midnight.getTime() - now.getTime();
-
         let h = Math.floor((diff % 86400000) / 3600000);
         let m = Math.floor((diff % 3600000) / 60000);
         let s = Math.floor((diff % 60000) / 1000);
 
         timerEl.innerText = `Sonraki ödüle: ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        
         if (diff <= 1000) {
             setTimeout(renderDailyRewards, 1500);
         }
@@ -1332,7 +1330,8 @@ function renderQuests() {
     const buildHtml = (q, progress, claimed, type, i) => {
         let perc = Math.min(100, (progress / q.target) * 100);
         let completed = progress >= q.target;
-        let btnHtml = completed && !claimed ? `<button class="quest-claim-btn" onclick="claimQuest('${type}', ${i})">ÖDÜLÜ AL</button>` : (claimed ? `<button class="quest-claim-btn" disabled>ALINDI</button>` : '');
+        let btnHtml = completed && !claimed ?
+            `<button class="quest-claim-btn" onclick="claimQuest('${type}', ${i})">ÖDÜLÜ AL</button>` : (claimed ? `<button class="quest-claim-btn" disabled>ALINDI</button>` : '');
         return `
             <div class="quest-item ${completed ? 'completed' : ''} ${claimed ? 'claimed' : ''}" title="${q.desc}">
                 <div class="quest-emoji">${q.emoji}</div>
@@ -1407,7 +1406,6 @@ function getContinent(cityName) {
 /* --- ŞEHİRLER --- */
 var citiesEasy = [["İstanbul", 41.00, 28.97], ["Ankara", 39.93, 32.85], ["İzmir", 38.41, 27.12], ["Antalya", 36.89, 30.71], ["Londra", 51.50, -0.12], ["Paris", 48.85, 2.35], ["Berlin", 52.52, 13.40], ["Roma", 41.90, 12.49], ["Madrid", 40.41, -3.70], ["Tokyo", 35.67, 139.65], ["New York", 40.71, -74.00], ["Sidney", -33.86, 151.20], ["Moskova", 55.75, 37.61], ["Dubai", 25.20, 55.27], ["Amsterdam", 52.36, 4.89], ["Brüksel", 50.85, 4.35], ["Viyana", 48.20, 16.37], ["Atina", 37.98, 23.72], ["Kahire", 30.04, 31.23], ["Pekin", 39.90, 116.40], ["Seul", 37.56, 126.97], ["Rio de Janeiro", -22.90, -43.17], ["Buenos Aires", -34.60, -58.38], ["Toronto", 43.65, -79.38], ["Los Angeles", 34.05, -118.24], ["Meksika City", 19.43, -99.13], ["Bangkok", 13.75, 100.50], ["Singapur", 1.35, 103.81], ["Lizbon", 38.72, -9.13], ["Stokholm", 59.32, 18.06]];
 var citiesHard = [["Varşova", 52.22, 21.01], ["Prag", 50.07, 14.43], ["Budapeşte", 47.49, 19.04], ["Cape Town", -33.92, 18.42], ["Helsinki", 60.16, 24.93], ["Oslo", 59.91, 10.75], ["Kopenhag", 55.67, 12.56], ["Zürih", 47.37, 8.54], ["Dublin", 53.34, -6.26], ["Reykjavik", 64.12, -21.82], ["Yeni Delhi", 28.61, 77.20], ["Kuala Lumpur", 3.13, 101.68], ["Manila", 14.59, 120.98], ["Cakarta", -6.20, 106.84], ["Santiago", -33.44, -70.66], ["Lima", -12.04, -77.04], ["Bogota", 4.71, -74.07], ["Hanoi", 21.02, 105.83], ["Taipei", 25.03, 121.56], ["Bükreş", 44.42, 26.10], ["Belgrad", 44.78, 20.44], ["Sofya", 42.69, 23.32], ["Lagos", 6.52, 3.37], ["Nairobi", -1.29, 36.82], ["Kazablanka", 33.57, -7.58], ["Bakü", 40.40, 49.86], ["Tiflis", 41.71, 44.78], ["Astana", 51.16, 71.47], ["Amman", 31.94, 35.92], ["Beyrut", 33.89, 35.50], ["Riyad", 24.71, 46.67], ["Tel Aviv", 32.08, 34.78], ["Kiev", 50.45, 30.52], ["Perth", -31.95, 115.86]];
-
 /* --- OYUN MANTIĞI --- */
 var map = L.map('map', {zoomControl: false, attributionControl: false, worldCopyJump: true}).setView([20,0], 3);
 var baseLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
@@ -1419,7 +1417,6 @@ if (profileData && profileData.mapStyle === 'Karanlık Harita') darkLayer.addTo(
 else baseLayer.addTo(map);
 
 var selectedCity, guessMarker=null, realMarker=null, line=null, score=0, timeLeft=120, roundActive=false, currentMode='normal', timerInterval, nextRoundInterval;
-
 function startCountdown(mode) {
     currentMode = mode; 
     document.getElementById('main-menu').style.visibility = 'hidden'; 
@@ -1429,7 +1426,7 @@ function startCountdown(mode) {
     const overlay = document.getElementById('start-countdown-overlay'); overlay.style.display = 'flex'; stopMusic();
     
     triggerQuest('d13'); triggerQuest('w16'); 
-    if(mode === 'normal') triggerQuest('d19');
+    if(mode === 'normal' || mode === 'summer_event') triggerQuest('d19');
     if(mode === 'speedrun') triggerQuest('d20');
 
     let c = 5; document.getElementById('countdown-num').innerText = c;
@@ -1449,6 +1446,13 @@ function startGame() {
     document.getElementById('game-bottom-bar').style.visibility = 'visible';
     document.getElementById('timer').style.visibility = (currentMode === 'hardcore' ? 'hidden' : 'visible');
     
+    // YAZ ETKİNLİĞİ KONTROLÜ
+    if (currentMode === 'summer_event') {
+        document.getElementById('map').classList.add('summer-map');
+    } else {
+        document.getElementById('map').classList.remove('summer-map');
+    }
+
     map.eachLayer(function(layer) { map.removeLayer(layer); });
     if(currentMode === 'blind_shot') { 
         if(profileData.mapStyle === 'Karanlık Harita') darkBlindLayer.addTo(map);
@@ -1469,8 +1473,7 @@ function startRound(first = false) {
     guessMarker = null; document.getElementById("guessBtn").classList.remove("active");
     document.getElementById("distanceBox").style.display="none"; document.getElementById("guessBtn").style.display="block";
     if(currentMode === 'speedrun' && first) timeLeft = 60;
-    else if(currentMode === 'normal') timeLeft = 120;
-
+    else if(currentMode === 'normal' || currentMode === 'summer_event') timeLeft = 120;
     let pool = Math.random() < 0.5 ? citiesEasy : citiesHard; selectedCity = pool[Math.floor(Math.random()*pool.length)];
     document.getElementById("cityName").innerText = selectedCity[0];
     roundActive = true; updateTimerUI();
@@ -1559,7 +1562,6 @@ function makeGuess() {
                 if(anyContinent20) unlockAchievement('achv_mid_6');
             }
             saveQuestState(qs);
-
             if (roundScore >= 4500) {
                 streak4500++;
                 localStorage.setItem('weekWorldStreak4500', streak4500);
@@ -1595,7 +1597,6 @@ function animateScoreWithOverlay(addedScore) {
         addedScoreEl.classList.add('active');
         playScoreTick(); // İlk belirdiğindeki pop sesi
     }, 50);
-
     // 2. Pop-up bittikten sonra sayılar hızlıca artmaya başlar
     setTimeout(() => {
         let duration = 800; // Sayma animasyonu süresi (ms)
@@ -1627,7 +1628,6 @@ function animateScoreWithOverlay(addedScore) {
         };
         window.requestAnimationFrame(step);
     }, 600);
-
     // 3. Animasyon biter, ekran temizlenir ve mola başlar
     setTimeout(() => {
         mainScoreEl.classList.remove('active');
@@ -1657,8 +1657,8 @@ function startMola() {
 
 function gameOver(msg) { 
     gamesPlayed++; gamesLost++; saveStats(); 
-    localStorage.setItem('weekWorldPendingXP', 75);
-    // Kaybetse de XP veriyoruz
+    let xpAmount = currentMode === 'summer_event' ? 150 : 75;
+    localStorage.setItem('weekWorldPendingXP', xpAmount); // Kaybetse de XP veriyoruz
     clearInterval(timerInterval); clearInterval(nextRoundInterval); document.getElementById("result").style.display = "block";
     document.getElementById("result").innerHTML = `<h2>oyun bitti</h2><p>${msg}</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#ffcc00; border:none; border-radius:10px; font-weight:bold; color:black; cursor:pointer;\">lobiye dön</button>`;
 }
@@ -1687,7 +1687,7 @@ function showFinalScreen() {
     if (currentMode === 'total_time' && timeLeft > 60) triggerQuest('w4');
     if (currentMode === 'total_time') triggerQuest('w28');
     if (profileData.mapStyle !== 'Varsayılan') triggerQuest('w6');
-    if (currentMode === 'normal') { triggerQuest('w15'); triggerQuest('w17'); }
+    if (currentMode === 'normal' || currentMode === 'summer_event') { triggerQuest('w15'); triggerQuest('w17'); }
     if (currentMode === 'speedrun') triggerQuest('w21');
     if (isCh) { triggerQuest('d11'); triggerQuest('w30'); }
 
@@ -1699,7 +1699,8 @@ function showFinalScreen() {
     }
 
     // OYUN BİTİMİ XP KAYDEDİLMESİ
-    localStorage.setItem('weekWorldPendingXP', 75);
+    let xpAmount = currentMode === 'summer_event' ? 150 : 75;
+    localStorage.setItem('weekWorldPendingXP', xpAmount);
 
     document.getElementById("result").style.display = "block";
     document.getElementById("result").innerHTML = `<h2 style="color:green">tebrikler!</h2><p>25.000 puan barajını geçtin!</p><button onclick=\"location.reload()\" style=\"padding:15px 30px; background:#2962ff; color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;\">lobiye dön</button>`;
@@ -1727,11 +1728,9 @@ function playXPAnimation(addedXP) {
     let currentTierXP = currentXP % 1000;
     fill.style.width = (currentTierXP / 10) + '%';
     barText.innerText = `${currentTierXP} / 1000 XP`;
-
     // 1. Container İçeri Kayar (1.5s)
     container.classList.add('show');
     playXPAnimSound('slide');
-
     setTimeout(() => {
         // 2. XP Sayısı Pop-Up (1s)
         text.classList.add('pop');
@@ -1768,7 +1767,8 @@ function playXPAnimation(addedXP) {
                 // 4. Container Dışarı Kayar
                 container.classList.remove('show');
                 setTimeout(() => { text.classList.remove('pop'); text.innerHTML=''; }, 1500);
-            }, 2500); // Kullanıcı ilerlemeyi izlesin diye bekleme süresi
+            }, 2500);
+            // Kullanıcı ilerlemeyi izlesin diye bekleme süresi
             
         }, 1500);
     }, 1500); 
